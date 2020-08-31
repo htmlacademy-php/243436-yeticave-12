@@ -30,8 +30,12 @@
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span class="lot__cost"><?= htmlspecialchars(get_sum($value['price'])); ?></span>
                             </div>
-                            <div class="lot__timer timer">
-                                12:23
+                            <div class="lot__timer timer <? if ((floor((strtotime($value['time']) - time()) / 3600)) < 60) : ?> timer--finishing <? endif;?>">
+                                <? 
+                                    foreach(get_dt_range($value['time']) as $val) {
+                                        echo $val;        
+                                    }
+                                ?>
                             </div>
                         </div>
                     </div>

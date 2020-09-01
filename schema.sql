@@ -41,6 +41,3 @@ CREATE TABLE users (
   lot_id INT UNSIGNED,
   rate_id INT UNSIGNED
 );
-
-
-

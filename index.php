@@ -83,7 +83,6 @@ $page_content = include_template('main.php', ['categories' => $categories, 'lots
 
 $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
 
-echo($layout_content);
+echo $layout_content;
 
 ?>
-

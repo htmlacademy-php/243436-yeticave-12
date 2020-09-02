@@ -2,6 +2,8 @@
 
 require_once('helpers.php');
 
+$hours = get_dt_range($value['time']);
+
 $is_auth = rand(0, 1);
 
 $user_name = 'Павел'; // укажите здесь ваше имя
@@ -14,7 +16,7 @@ $lots = [
         'category' => 'Доски и лыжи',
         'price' => 10999,
         'url' => 'img/lot-1.jpg',
-        'time' => '2020-09-01'
+        'time' => '2020-09-03'
     ],
     [
         'name' => 'DC Ply Mens 2016/2017 Snowboard',
@@ -56,21 +58,14 @@ $lots = [
 function get_dt_range ($date) {
 	$future_time = strtotime($date);
 	$now_time = time();
-	$result_time_hour = floor(($future_time - $now_time) / 3600).':';
+	$result_time_hour = floor(($future_time - $now_time) / 3600);
 	$result_time_min = floor((($future_time - $now_time) % 3600)/60);
 
-	if ($result_time_min < 10) {
-		$result_time_min = str_pad($result_time_min, 2, "0", STR_PAD_LEFT);;
-	}
+	$result_time_min = str_pad($result_time_min, 2, "0", STR_PAD_LEFT);;
+	$result_time_hour = str_pad($result_time_hour, 2, "0", STR_PAD_LEFT);;
 
-	if ($result_time_hour < 10) {
-		$result_time_hour = str_pad($result_time_hour, 3, "0", STR_PAD_LEFT);;
-	}
-
-	$time_array = [$result_time_hour, $result_time_min];
-
-	return $time_array;
-}
+	return [$result_time_hour, $result_time_min];
+};
 
 function get_sum ($cost) {
 	
@@ -82,7 +77,7 @@ function get_sum ($cost) {
 	
 	return $cost.' ₽';
 
-}
+};
 
 $page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots]);
 

@@ -30,7 +30,7 @@
                                 <span class="lot__amount">Стартовая цена</span>
                                 <span class="lot__cost"><?= htmlspecialchars(get_sum($value['price'])); ?></span>
                             </div>
-                            <div class="lot__timer timer <? [$hours, $minutes] = get_dt_range($value['time']); if ($hours < 10) : ?> timer--finishing <? endif;?>">
+                            <div class="lot__timer timer <? [$hours, $minutes] = get_dt_range($value['time']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
                                 <? 
                                     echo "{$hours}:{$minutes}";
                                 ?>

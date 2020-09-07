@@ -2,7 +2,7 @@ USE yeticave;
 
 
 -- Добавляем в таблицу недостающие категории
-INSERT INTO category(name, code) VALUES ('Инструменты', 'tools'), ('Разное', 'other');
+INSERT INTO category(name, code) VALUES ('Доски и лыжи', 'boards'), ('Крепления', 'attachment'), ('Ботинки', 'boots'), ('Одежда', 'clothing'), ('Инструменты', 'tools'), ('Разное', 'other');
 
 -- Добавляем двух новых пользователей
 INSERT INTO 
@@ -12,11 +12,6 @@ INSERT INTO
 INSERT INTO 
   user(created_at, email, name, password, contact) 
   VALUES (NOW(), 'alex@mail.ru', 'Alex', '111', 'skype: alex');
-
--- Добавляем внешний ключ для таблицы lot для связи с таблицами
-ALTER TABLE lot ADD FOREIGN KEY (user_id) REFERENCES user(id);
-ALTER TABLE lot ADD FOREIGN KEY (winner_id) REFERENCES user(id);
-ALTER TABLE lot ADD FOREIGN KEY (category_id) REFERENCES category(id);
 
 -- Добавляем существующие объявления(лоты)
 INSERT INTO 
@@ -41,7 +36,7 @@ INSERT INTO
     'img/lot-2.jpg',
     159999,
     '2020-09-09',
-    12000,
+    160000,
     1,
     1); 
 
@@ -54,7 +49,7 @@ INSERT INTO
     'img/lot-3.jpg',
     8000,
     '2020-09-07',
-    12000,
+    10000,
     1,
     2);  
 
@@ -67,7 +62,7 @@ INSERT INTO
     'img/lot-4.jpg',
     10999,
     '2020-09-10',
-    12000,
+    11000,
     2,
     3); 
 
@@ -80,7 +75,7 @@ INSERT INTO
     'img/lot-5.jpg',
     7500,
     '2020-09-12',
-    12000,
+    8000,
     2,
     4); 
 
@@ -93,19 +88,15 @@ INSERT INTO
     'img/lot-6.jpg',
     5400,
     '2020-09-11',
-    12000,
+    6000,
     2,
     6);    
 
--- Добавляем внешний ключ для таблицы rate для связи с таблицами
+-- Добавляем три ставки
 
-ALTER TABLE rate ADD FOREIGN KEY (user_id) REFERENCES user(id);
-ALTER TABLE rate ADD FOREIGN KEY (lot_id) REFERENCES lot(id);
-
--- Добавляем пару ставок
-
-INSERT INTO rate (date, cost, user_id, lot_id) VALUES (NOW(), 20000, 1, 2);
+INSERT INTO rate (date, cost, user_id, lot_id) VALUES (NOW(), 170000, 1, 2);
 INSERT INTO rate (date, cost, user_id, lot_id) VALUES (NOW(), 30000, 2, 1);
+INSERT INTO rate (date, cost, user_id, lot_id) VALUES (NOW(), 180000, 1, 2);
 
 -- Получение всех категорий
 
@@ -113,13 +104,16 @@ SELECT name FROM category;
 
 -- Получение самых новых, открытых лотов. Каждый лот включает название, стартовую цену, ссылку на изображение, текущую цену, название категории
 
-SELECT title, cost, path, rate_step + cost AS current_price, category.name AS category 
-	FROM lot JOIN category ON lot.category_id = category.id 
-		WHERE date_finish > NOW();
+SELECT lot.id, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
+	FROM lot 
+		JOIN category ON lot.category_id = category.id
+	 	JOIN rate ON rate.lot_id = lot.id
+			WHERE date_finish > NOW()
+			GROUP BY lot.id;
 
 -- Показ лота по его id. И название категории, к которой принадлежит лот
 
-SELECT lot.id, lot.title, category.name FROM lot JOIN category ON lot.category_id = category.id;
+SELECT lot.id, lot.title, category.name FROM lot JOIN category ON lot.category_id = category.id WHERE lot.id = 2;
 
 -- Обновил название лота по его идентификатору
 

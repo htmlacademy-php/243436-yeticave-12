@@ -8,8 +8,6 @@ CREATE TABLE category (
 	code VARCHAR(20) NOT NULL
 );
 
-INSERT INTO category (name, code) VALUES ('Доски и лыжи', 'boards'), ('Крепления', 'attachment'), ('Ботинки', 'boots'), ('Одежда', 'clothing');
-
 CREATE TABLE lot (
 	id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   date_start DATETIME NOT NULL,
@@ -40,3 +38,10 @@ CREATE TABLE user (
 	password CHAR(64) NOT NULL,
 	contact VARCHAR(20) NOT NULL
 );
+
+ALTER TABLE lot ADD FOREIGN KEY (user_id) REFERENCES user(id);
+ALTER TABLE lot ADD FOREIGN KEY (winner_id) REFERENCES user(id);
+ALTER TABLE lot ADD FOREIGN KEY (category_id) REFERENCES category(id);
+
+ALTER TABLE rate ADD FOREIGN KEY (user_id) REFERENCES user(id);
+ALTER TABLE rate ADD FOREIGN KEY (lot_id) REFERENCES lot(id);

@@ -8,52 +8,52 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Павел'; // укажите здесь ваше имя
 
-$categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
 
-$lots = [
-    [
-        'name' => '2014 Rossignol District Snowboard',
-        'category' => 'Доски и лыжи',
-        'price' => 10999,
-        'url' => 'img/lot-1.jpg',
-        'time' => '2020-09-08'
-    ],
-    [
-        'name' => 'DC Ply Mens 2016/2017 Snowboard',
-        'category' => 'Доски и лыжи',
-        'price' => 159999,
-        'url' => 'img/lot-2.jpg',
-        'time' => '2020-09-09'
-    ],
-    [
-        'name' => 'Крепления Union Contact Pro 2015 года размер L/XL',
-        'category' => 'Крепления',
-        'price' => 8000,
-        'url' => 'img/lot-3.jpg',
-        'time' => '2020-09-08'
-    ],
-    [
-        'name' => 'Ботинки для сноуборда DC Mutiny Charocal',
-        'category' => 'Ботинки',
-        'price' => 10999,
-        'url' => 'img/lot-4.jpg',
-        'time' => '2020-09-10'
-    ],
-    [
-        'name' => 'Куртка для сноуборда DC Mutiny Charocal',
-        'category' => 'Одежда',
-        'price' => 7500,
-        'url' => 'img/lot-5.jpg',
-        'time' => '2020-09-12'
-    ],
-    [
-        'name' => 'Маска Oakley Canopy',
-        'category' => 'Разное',
-        'price' => 5400,
-        'url' => 'img/lot-6.jpg',
-        'time' => '2020-09-11'
-    ]
-];
+
+$con = mysqli_connect('localhost', 'root', 'root', 'yeticave');
+mysqli_set_charset($con, 'utf8');
+
+if (!$con) {
+    echo 'Ошибка подключения: '.mysqli_connect_error();
+}
+
+
+
+$sql_lots = 'SELECT date_finish, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
+    FROM lot 
+        JOIN category ON lot.category_id = category.id
+        JOIN rate ON rate.lot_id = lot.id
+            WHERE date_finish > NOW()
+            GROUP BY lot.id
+            ORDER BY lot.date_start DESC';
+
+$result_lots = mysqli_query($con, $sql_lots);
+
+if(!$result_lots) {
+    $error = mysqli_error($con);
+    echo 'Ошибка MySQL: '.$error;
+}
+
+$lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+
+
+
+$sql_categories = 'SELECT name, code FROM category'; 
+
+$result_categories = mysqli_query($con, $sql_categories);
+
+if(!$result_categories) {
+    $error = mysqli_error($con);
+    echo 'Ошибка MySQL: '.$error;
+}
+
+$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
+
+
+
+
+
+// $categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
 
 function get_dt_range ($date) {
 	$future_time = strtotime($date);

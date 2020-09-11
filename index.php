@@ -2,35 +2,33 @@
 
 require_once('helpers.php');
 
-$hours = get_dt_range($value['time']);
-
 $is_auth = rand(0, 1);
 
-$user_name = 'Павел'; // укажите здесь ваше имя
+$user_name = 'Павел';
 
 
 
-$con = mysqli_connect('localhost', 'root', 'root', 'yeticave');
-mysqli_set_charset($con, 'utf8');
+$connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
+mysqli_set_charset($connect, 'utf8');
 
-if (!$con) {
+if (!$connect) {
     echo 'Ошибка подключения: '.mysqli_connect_error();
 }
 
 
 
-$sql_lots = 'SELECT date_finish, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
+$sql_lots = 'SELECT rate.lot_id, lot.id, date_finish, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
     FROM lot 
         JOIN category ON lot.category_id = category.id
-        JOIN rate ON rate.lot_id = lot.id
+        LEFT JOIN rate ON rate.lot_id = lot.id
             WHERE date_finish > NOW()
             GROUP BY lot.id
             ORDER BY lot.date_start DESC';
 
-$result_lots = mysqli_query($con, $sql_lots);
+$result_lots = mysqli_query($connect, $sql_lots);
 
 if(!$result_lots) {
-    $error = mysqli_error($con);
+    $error = mysqli_error($connect);
     echo 'Ошибка MySQL: '.$error;
 }
 
@@ -40,20 +38,15 @@ $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
 $sql_categories = 'SELECT name, code FROM category'; 
 
-$result_categories = mysqli_query($con, $sql_categories);
+$result_categories = mysqli_query($connect, $sql_categories);
 
 if(!$result_categories) {
-    $error = mysqli_error($con);
+    $error = mysqli_error($connect);
     echo 'Ошибка MySQL: '.$error;
 }
 
 $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
 
-
-
-
-
-// $categories = ['Доски и лыжи', 'Крепления', 'Ботинки', 'Одежда', 'Инструменты', 'Разное'];
 
 function get_dt_range ($date) {
 	$future_time = strtotime($date);
@@ -78,6 +71,8 @@ function get_sum ($cost) {
 	return $cost.' ₽';
 
 };
+
+
 
 $page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots]);
 

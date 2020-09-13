@@ -1,9 +1,12 @@
 <?php
   require_once('helpers.php');
+  require_once('functions.php');
 
   $is_auth = rand(0, 1);
   
   $user_name = 'Павел';
+
+  $connect = db_connect('localhost', 'root', 'root', 'yeticave');
 
   if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -14,14 +17,8 @@
     header("Location: http://243436-yeticave-12/pages/404.html");
   }
 
-  $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
-  mysqli_set_charset($connect, 'utf8');
 
-  if (!$connect) {
-    echo 'Ошибка подключения: '.mysqli_connect_error();
-  }
-
-  $sql_lots = 'SELECT lot.rate_step, rate.lot_id, date_finish, description, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
+  $sql_lots = 'SELECT lot.rate_step, date_finish, description, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot 
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id

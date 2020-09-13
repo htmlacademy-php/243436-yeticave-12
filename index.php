@@ -1,6 +1,7 @@
 <?php
 
 require_once('helpers.php');
+require_once('functions.php');
 
 $is_auth = rand(0, 1);
 
@@ -8,16 +9,11 @@ $user_name = 'Павел';
 
 
 
-$connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
-mysqli_set_charset($connect, 'utf8');
-
-if (!$connect) {
-    echo 'Ошибка подключения: '.mysqli_connect_error();
-}
+$connect = db_connect('localhost', 'root', 'root', 'yeticave');
 
 
 
-$sql_lots = 'SELECT rate.lot_id, lot.id, date_finish, category.name AS category, title, path, lot.cost, MAX(rate.cost) AS current_price
+$sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot 
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id

@@ -29,27 +29,11 @@
               <div class="lot-item__cost-state">
                 <div class="lot-item__rate">
                   <span class="lot-item__amount">Текущая цена</span>
-                  <span class="lot-item__cost">                     
-                    <?php
-                      if ($value['lot_id'] == NULL) {
-                        echo htmlspecialchars(get_sum($value['cost']));
-                      } else {
-                        echo htmlspecialchars(get_sum($value['current_price'])); 
-                      }                      
-                    ?>
-                  </span>
+                  <span class="lot-item__cost"><?= htmlspecialchars(get_sum($value['current_price'])); ?></span>
                 </div>
                 <div class="lot-item__min-cost">
                   Мин. ставка 
-                  <span>                    
-                    <?php
-                      if ($value['lot_id'] == NULL) {
-                        echo (htmlspecialchars(get_sum($value['cost'] + $value['rate_step'])));
-                      } else {
-                        echo (htmlspecialchars(get_sum($value['current_price'] + $value['rate_step']))); 
-                      }                      
-                    ?> 
-                  </span>
+                  <span><?= (htmlspecialchars(get_sum($value['current_price'] + $value['rate_step'])));?></span>
                 </div>
               </div>
             </div>

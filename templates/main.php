@@ -26,15 +26,7 @@
                         <div class="lot__state">
                             <div class="lot__rate">
                                 <span class="lot__amount">Стартовая цена</span>
-                                <span class="lot__cost">
-                                <?php
-                                    if ($value['lot_id'] == NULL) {
-                                        echo htmlspecialchars(get_sum($value['cost']));
-                                    } else {
-                                        echo htmlspecialchars(get_sum($value['current_price'])); 
-                                    }                      
-                                ?>
-                                </span>
+                                <span class="lot__cost"><?= htmlspecialchars(get_sum($value['current_price'])); ?></span>
                             </div>
                             <div class="lot__timer timer <? [$hours, $minutes] = get_dt_range($value['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
                                 <? 

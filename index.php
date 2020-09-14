@@ -8,8 +8,7 @@ $is_auth = rand(0, 1);
 $user_name = 'Павел';
 
 
-$connect = db_connect('localhost', 'root', 'root', 'yeticave');
-
+$connect = db_connect();
 
 
 $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
@@ -31,16 +30,7 @@ $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
 
 
-$sql_categories = 'SELECT name, code FROM category'; 
-
-$result_categories = mysqli_query($connect, $sql_categories);
-
-if(!$result_categories) {
-    $error = mysqli_error($connect);
-    echo 'Ошибка MySQL: '.$error;
-}
-
-$categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
+$categories = get_categories($connect);
 
 
 

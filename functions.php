@@ -1,8 +1,8 @@
 <?php
 
-  function db_connect($host, $login, $password, $db) {
+  function db_connect() {
 
-    $connect = mysqli_connect($host, $login, $password, $db);
+    $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
     mysqli_set_charset($connect, 'utf8');
     
     if (!$connect) {
@@ -12,6 +12,7 @@
 
     return $connect;
   }
+
 
 
   function get_dt_range ($date) {
@@ -26,6 +27,7 @@
     return [$result_time_hour, $result_time_min];
   };
 
+
   
   function get_sum ($cost) {
     
@@ -36,6 +38,22 @@
     }
     
     return $cost.' ₽';
+  };
+
   
-  };  
+  
+  function get_categories($connect) {
+    $sql_categories = 'SELECT name, code FROM category'; 
+
+    $result_categories = mysqli_query($connect, $sql_categories);
+
+    if(!$result_categories) {
+        $error = mysqli_error($connect);
+        echo 'Ошибка MySQL: '.$error;
+    }
+
+    $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
+
+    return $categories;
+  }
 ?>

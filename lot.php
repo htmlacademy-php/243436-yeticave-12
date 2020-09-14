@@ -6,17 +6,15 @@
   
   $user_name = 'Павел';
 
-  
-  $connect = db_connect('localhost', 'root', 'root', 'yeticave');
 
-  if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-    if ($id == '') {
-      header("Location: http://243436-yeticave-12/pages/404.html");
-    }
-  } else {
-    header("Location: http://243436-yeticave-12/pages/404.html");
-  }
+  $connect = db_connect();
+
+
+
+  if (!isset($_GET['id']) || '' == $id = (int)$_GET['id'] ) {
+    header("Location: pages/404.html");
+  };
+
 
 
   $sql_lots = 'SELECT lot.rate_step, date_finish, description, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
@@ -33,18 +31,17 @@
       echo 'Ошибка MySQL: '.$error;
   }
 
-  $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+  if(!mysqli_num_rows($result_lots)) {
+    header("Location: pages/404.html");
+  };
+
+  $lot = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
 
 
   $sql_lots_id = 'SELECT id FROM lot WHERE id = '.$id;
 
   $result_lots_id = mysqli_query($connect, $sql_lots_id);
-
-  if(!$result_lots_id) {
-    $error = mysqli_error($connect);
-    echo 'Ошибка MySQL: '.$error;
-  }
 
   $count_lots_id = mysqli_num_rows($result_lots_id);
 
@@ -53,24 +50,15 @@
   }
 
 
-
-  $sql_categories = 'SELECT name, code FROM category'; 
-
-  $result_categories = mysqli_query($connect, $sql_categories);
-
-  if(!$result_categories) {
-      $error = mysqli_error($connect);
-      echo 'Ошибка MySQL: '.$error;
-  }
-
-  $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
+  
+  $categories = get_categories($connect);
 
 
-  $page_content = include_template('lots.php', ['categories' => $categories, 'lots' => $lots]);
+  
+  $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot]);
 
   $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
 
   echo $layout_content;
-
-
+  
 ?>

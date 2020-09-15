@@ -386,6 +386,10 @@ main.container {
   list-style: none;
 }
 
+.nav__list.top {
+  margin-left: -15px;
+}
+
 .nav__item a {
   position: relative;
   display: block;

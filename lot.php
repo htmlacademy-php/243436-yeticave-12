@@ -36,20 +36,6 @@
   };
 
   $lot = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
-
-
-
-  $sql_lots_id = 'SELECT id FROM lot WHERE id = '.$id;
-
-  $result_lots_id = mysqli_query($connect, $sql_lots_id);
-
-  $count_lots_id = mysqli_num_rows($result_lots_id);
-
-  if($count_lots_id == '') {
-    header("Location: http://243436-yeticave-12/pages/404.html");
-  }
-
-
   
   $categories = get_categories($connect);
 

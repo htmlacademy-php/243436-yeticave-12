@@ -43,7 +43,7 @@
   
   
   function get_categories($connect) {
-    $sql_categories = 'SELECT name, code FROM category'; 
+    $sql_categories = 'SELECT id, name, code FROM category'; 
 
     $result_categories = mysqli_query($connect, $sql_categories);
 
@@ -56,4 +56,21 @@
 
     return $categories;
   }
+
+
+  function validateFilled($name) {
+    if (empty($_POST[$name])) {
+      return "form--invalid";
+    }
+  }
+
+  function invalid($price) {
+
+    if($_SERVER['REQUEST_METHOD'] == 'POST') {    
+      $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : intval($_POST[$price]);
+    };
+
+    return $invalid_price;
+  }
+
 ?>

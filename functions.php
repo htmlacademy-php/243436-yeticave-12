@@ -1,5 +1,7 @@
 <?php
-
+  /**
+  * mysqli Ресурс соединения
+  */
   function db_connect() {
 
     $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
@@ -14,7 +16,11 @@
   }
 
 
-
+  /**
+  * Вовращает остаток времени до будущей даты и добавляет к строке 0, если остаток часов или минут меньше 10
+  *
+  * @param $date будущая дата в формате '2020-10-15'
+  */
   function get_dt_range ($date) {
     $future_time = strtotime($date);
     $now_time = time();
@@ -27,8 +33,14 @@
     return [$result_time_hour, $result_time_min];
   };
 
-
-  
+  /**
+  * Форматирует число с разделением групп и добавляет занак '₽' к сумме
+  *
+  * Пример использования:
+  * get_sum(10000); // 10 000 ₽
+  * 
+  * @param $cost число для форматирования
+  */  
   function get_sum ($cost) {
     
     ceil($cost);
@@ -39,9 +51,12 @@
     
     return $cost.' ₽';
   };
-
   
-  
+  /**
+  * Возвращает массив со всеми данным таблицы category из БД
+  * 
+  * @param $connect mysqli Ресурс соединения
+  */  
   function get_categories($connect) {
     $sql_categories = 'SELECT id, name, code FROM category'; 
 
@@ -57,20 +72,27 @@
     return $categories;
   }
 
-
+  /**
+  * Валидация на пустое значение
+  * 
+  * @param $name проверяемое значение
+  */  
   function validateFilled($name) {
     if (empty($_POST[$name])) {
       return "form--invalid";
     }
   }
 
-  function invalid($price) {
-
-    if($_SERVER['REQUEST_METHOD'] == 'POST') {    
-      $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : intval($_POST[$price]);
-    };
+  /**
+  * Валидация на целое, число которое больше 0
+  * 
+  * @param $price проверяемое значение
+  */  
+  function invalid($price) { 
+    $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
 
     return $invalid_price;
   }
+
 
 ?>

@@ -4,7 +4,9 @@
 
   $is_auth = rand(0, 1);
 
-  $user_name = 'Добавление лота';
+  $user_name = 'Павел';
+
+  $title = 'Добавление лота';
 
   $connect = db_connect();
 
@@ -38,31 +40,7 @@
       $errors[$key] = $rule();
     }
   };
-
-  $errors = array_filter($errors);
-
-  $form_invalid = !empty($errors) && $_SERVER['REQUEST_METHOD'] == 'POST' ? 'form--invalid' : '';  
-
-
-
-  foreach($errors as $key => $error) {
-    if($_SERVER['REQUEST_METHOD'] == 'POST') {
-      $value_invalid[$key] = 'form__item--invalid';
-    };
-  };
  
-
-  if($_POST['category'] == 'Выберите категорию') {
-     $errors['category'] = 'form--invalid';
-     $file_invalid = 'form__item--invalid'; 
-  };
-
-
-  if (empty($_FILES['lot-img']['name']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
-    $errors['lot-img'] = 'form--invalid';
-    $file_invalid = 'form__item--invalid';
-  };
-
   
 
   if (
@@ -73,26 +51,16 @@
     isset($_POST['lot-step']) && 
     isset($_POST['lot-date'])
   ) {
-    $lot_name = mysqli_real_escape_string($connect, $_POST['lot-name']);
-    $select_category = mysqli_real_escape_string($connect, $_POST['category']);
-    $message = mysqli_real_escape_string($connect, $_POST['message']);
-    $lot_rate = intval($_POST['lot-rate']);
-    $lot_step = intval($_POST['lot-step']);
-    $lot_date = mysqli_real_escape_string($connect, $_POST['lot-date']);
+    $lot_name = $_POST['lot-name'];
+    $select_category = $_POST['category'];
+    $message = $_POST['message'];
+    $lot_rate = $_POST['lot-rate'];
+    $lot_step = $_POST['lot-step'];
+    $lot_date = $_POST['lot-date'];
   };
 
 
-
-
-  $rate_invalid = invalid('lot-rate');
-
-  $step_invalid = invalid('lot-step');
-
-  $date_invalid = (strtotime($lot_date) < (time() + 86400)) && ($_SERVER['REQUEST_METHOD'] == 'POST') ? 'form__item--invalid' : $lot_date;  
-
-
-
-
+  
   if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
     $file_name = $_FILES['lot-img']['name'];
     $file_path = __DIR__ . '/uploads/';
@@ -119,30 +87,54 @@
     }    
   };
 
-  $sql_lot = "INSERT INTO 
-    lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
-    VALUES
-      (NOW(), '$lot_name', '$message', '$file_url', '$lot_rate', '$lot_date', '$lot_step', 1, '$select_category')";
+  $date_start = date('Y-m-d H:i:s', time());
+  $user_id = 1;
 
 
-  if ($_SERVER['REQUEST_METHOD'] == 'POST' && empty($errors)) {
-    $result_lot = mysqli_query($connect, $sql_lot);
+  $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
+  $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    if(!$result_lot) {
-      $error = mysqli_error($connect);
-      echo 'Ошибка MySQL: '.$error;
-    }
 
-    if($result_lot) {
+
+  if($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $form_invalid = !empty($errors) ? 'form--invalid' : '';
+    
+    foreach($errors as $key => $error) {
+      $value_invalid[$key] = 'form__item--invalid';
+    };
+
+    if (empty($_FILES['lot-img']['name'])) {
+      $errors['lot-img'] = 'form--invalid';
+      $file_invalid = 'form__item--invalid';
+    };
+
+    if($_POST['category'] == 'Выберите категорию') {
+      $errors['category'] = 'form--invalid';
+      $category_invalid = 'form__item--invalid'; 
+    };
+
+    $rate_invalid = invalid('lot-rate');
+
+    $step_invalid = invalid('lot-step');
+
+    $date_invalid = (strtotime($lot_date) < (time() + 86400)) && !is_date_valid($lot_date) ? 'form__item--invalid' : $lot_date;
+    
+    
+    
+    if (empty($errors)) {
+      mysqli_stmt_execute(db_get_prepare_stmt($connect, $sql_lot, $data));
       $result_id = mysqli_insert_id($connect);
       header("Location: lot.php?id=$result_id");
-    }
+    };
   };
 
+  $errors = array_filter($errors);
 
-  $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
+  $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid, 'category_invalid' => $category_invalid]);
+
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title]);
 
   echo $layout_content;
 ?>

@@ -57,35 +57,7 @@
       }
     }
 
-    
-    if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
-      $file_name = $_FILES['lot-img']['name'];
-      $file_path = __DIR__ . '/uploads/';
-      $file_url = 'uploads/' . $file_name;
-
-      $mymetype = mime_content_type($_FILES['lot-img']['tmp_name']);
-      $mymetype_value = ['image/jpeg', 'image/png'];
-
-      if(!in_array($mymetype, $mymetype_value)) {
-        $file_invalid = 'form__item--invalid';
-        $errors['lot-img'] = 'form__item--invalid';
-      }
-      
-      if (empty($errors)) {
-        move_uploaded_file($_FILES['lot-img']['tmp_name'], $file_path . $file_name);
-      }
-    }
-
-
-    $date_start = date('Y-m-d H:i:s', time());
-    $user_id = 1;
-
-
-    $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
-    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-    
+ 
 
     $form_invalid = !empty($errors) ? 'form--invalid' : '';
     
@@ -113,6 +85,34 @@
 
 
     $errors = array_filter($errors); 
+    
+    if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
+      $file_name = $_FILES['lot-img']['name'];
+      $file_path = __DIR__ . '/uploads/';
+      $file_url = 'uploads/' . $file_name;
+
+      $mymetype = mime_content_type($_FILES['lot-img']['tmp_name']);
+      $mymetype_value = ['image/jpeg', 'image/png'];
+
+      if(!in_array($mymetype, $mymetype_value)) {
+        $file_invalid = 'form__item--invalid';
+        $errors['lot-img'] = 'form__item--invalid';
+      }
+      
+      if (empty($errors)) {
+        move_uploaded_file($_FILES['lot-img']['tmp_name'], $file_path.$file_name);
+      }
+    }
+
+
+    $date_start = date('Y-m-d H:i:s', time());
+    $user_id = 1;
+
+
+    $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
+    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
 
 
     $prepare = db_get_prepare_stmt($connect, $sql_lot, $data);

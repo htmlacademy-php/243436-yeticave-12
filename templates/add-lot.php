@@ -13,7 +13,7 @@
     <div class="form__container-two">
       <div class="form__item <?= htmlspecialchars($value_invalid['lot-name']); ?>"> <!-- form__item--invalid -->
         <label for="lot-name">Наименование <sup>*</sup></label>
-        <input id="lot-name" type="text" name="lot-name" placeholder="Введите наименование лота" value="<?= $_POST['lot-name'] ?>">
+        <input id="lot-name" type="text" name="lot-name" placeholder="Введите наименование лота" value="<?= htmlspecialchars($_POST['lot-name']); ?>">
         <span class="form__error">Введите наименование лота</span>
       </div>
       <div class="form__item <?= $category_invalid; ?>">
@@ -21,7 +21,7 @@
         <select id="category" name="category">
           <option>Выберите категорию</option>
           <?php foreach ($categories as $category): ?>
-            <option <?= $category['name'] == $_POST['category'] ? 'selected' : ''; ?> ><?= htmlspecialchars($category['name']); ?></option>
+            <option value="<?= $category['id']; ?>" <?= $category['id'] == $_POST['category'] ? 'selected' : ''; ?> ><?= htmlspecialchars($category['name']); ?></option>
           <?php endforeach; ?>  
         </select>
         <span class="form__error">Выберите категорию</span>
@@ -29,7 +29,7 @@
     </div>
     <div class="form__item form__item--wide <?= htmlspecialchars($value_invalid['message']); ?>">
       <label for="message">Описание <sup>*</sup></label>
-      <textarea id="message" name="message" placeholder="Напишите описание лота"><?= $_POST['message'] ?></textarea>
+      <textarea id="message" name="message" placeholder="Напишите описание лота"><?= htmlspecialchars($_POST['message']) ?></textarea>
       <span class="form__error">Напишите описание лота</span>
     </div>
     <div class="form__item form__item--file <?= htmlspecialchars($file_invalid); ?>">
@@ -55,7 +55,7 @@
       </div>
       <div class="form__item <?= htmlspecialchars($date_invalid); ?>">
         <label for="lot-date">Дата окончания торгов <sup>*</sup></label>
-        <input class="form__input-date" id="lot-date" type="text" name="lot-date" placeholder="Введите дату в формате ГГГГ-ММ-ДД" value="<?= $_POST['lot-date'] ?>">
+        <input class="form__input-date" id="lot-date" type="text" name="lot-date" placeholder="Введите дату в формате ГГГГ-ММ-ДД" value="<?= htmlspecialchars($_POST['lot-date']); ?>">
         <span class="form__error">Введите дату завершения торгов</span>
       </div>
     </div>

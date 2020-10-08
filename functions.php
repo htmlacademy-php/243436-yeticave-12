@@ -1,6 +1,6 @@
 <?php
   /**
-  * mysqli Ресурс соединения
+  * @return mysqli Ресурс соединения
   */
   function db_connect() {
 
@@ -19,9 +19,11 @@
   /**
   * Вовращает остаток времени до будущей даты и добавляет к строке 0, если остаток часов или минут меньше 10
   *
-  * @param $date будущая дата в формате '2020-10-15'
+  * @param string $date будущая дата в формате '2020-10-15'
+  *
+  * @return mixed остаток часов и минут
   */
-  function get_dt_range ($date) {
+  function get_dt_range (string $date) {
     $future_time = strtotime($date);
     $now_time = time();
     $result_time_hour = floor(($future_time - $now_time) / 3600);
@@ -39,11 +41,13 @@
   * Пример использования:
   * get_sum(10000); // 10 000 ₽
   * 
-  * @param $cost число для форматирования
+  * @param float $cost число для форматирования
+  *
+  * @return string цена
   */  
-  function get_sum ($cost) {
+  function get_sum (float $cost) {
     
-    ceil($cost);
+    $cost = ceil($cost);
   
     if ($cost >= 1000) {
       $cost = number_format($cost, 0, ',', ' ');
@@ -55,7 +59,9 @@
   /**
   * Возвращает массив со всеми данным таблицы category из БД
   * 
-  * @param $connect mysqli Ресурс соединения
+  * @param mysqli $connect Ресурс соединения
+  *
+  * @return mixed список категорий
   */  
   function get_categories($connect) {
     $sql_categories = 'SELECT id, name, code FROM category'; 
@@ -75,9 +81,11 @@
   /**
   * Валидация на пустое значение
   * 
-  * @param $name проверяемое значение
+  * @param string $name проверяемое значение
+  *
+  * @return string наименование класса для валидации
   */  
-  function validateFilled($name) {
+  function validateFilled(string $name) {
     if (empty($_POST[$name])) {
       return "form--invalid";
     }
@@ -87,11 +95,37 @@
   * Валидация на целое, число которое больше 0
   * 
   * @param $price проверяемое значение
+  *
+  * @return string наименование класса для валидации или введенное значение в поле
   */  
-  function invalid($price) { 
-    $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
+  function validate_price($price) {
+    $invalid_price = '';
+    
+    if(isset($_POST[$price])) {
+      $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
+    }
 
     return $invalid_price;
+  }
+
+  /**
+  * Возвращает id последнего добавленного лота
+  * 
+  * @param mixed $prepare подготовленное выражение на основе готового SQL запроса и переданных данных
+  * @param mixed $errors массив с ошибками валидации
+  * @param mysqli $connect Ресурс соединения
+  *
+  * @return integer  id последнего лота
+  */ 
+  function get_result_id($prepare, $errors, $connect) {
+    $result_id = '';
+
+    if (empty($errors)) {
+      mysqli_stmt_execute($prepare);
+      $result_id = mysqli_insert_id($connect);
+    }
+
+    return $result_id;
   }
 
 

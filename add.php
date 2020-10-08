@@ -14,35 +14,6 @@
 
 
 
-  $errors = [];
-
-  $rules = [
-    'lot-name' => function() {
-      return validateFilled('lot-name');
-    },
-    'message' => function() {
-      return validateFilled('message');
-    },
-    'lot-rate' => function() {
-      return validateFilled('lot-rate');
-    },
-    'lot-step' => function() {
-      return validateFilled('lot-step');
-    },
-    'lot-date' => function() {
-      return validateFilled('lot-date');
-    }
-  ];
-
-  foreach ($_POST as $key => $value) {
-    if (isset($rules[$key])) {
-      $rule = $rules[$key];
-      $errors[$key] = $rule();
-    }
-  };
- 
-  
-
   if (
     isset($_POST['lot-name']) && 
     isset($_POST['category']) && 
@@ -57,49 +28,69 @@
     $lot_rate = $_POST['lot-rate'];
     $lot_step = $_POST['lot-step'];
     $lot_date = $_POST['lot-date'];
-  };
-
-
   
-  if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
-    $file_name = $_FILES['lot-img']['name'];
-    $file_path = __DIR__ . '/uploads/';
-    $file_url = 'uploads/' . $file_name;
 
-    $mymetype = mime_content_type($_FILES['lot-img']['tmp_name']);
-    $mymetype_value = ['image/jpeg', 'image/png'];
+    $errors = [];
 
-    if(!in_array($mymetype, $mymetype_value)) {
-      $file_invalid = 'form__item--invalid';
-      $errors['lot-img'] = 'form__item--invalid';
+    $rules = [
+      'lot-name' => function() {
+        return validateFilled('lot-name');
+      },
+      'message' => function() {
+        return validateFilled('message');
+      },
+      'lot-rate' => function() {
+        return validateFilled('lot-rate');
+      },
+      'lot-step' => function() {
+        return validateFilled('lot-step');
+      },
+      'lot-date' => function() {
+        return validateFilled('lot-date');
+      }
+    ];
+
+    foreach ($_POST as $key => $value) {
+      if (isset($rules[$key])) {
+        $rule = $rules[$key];
+        $errors[$key] = $rule();
+      }
     }
+
     
-    if (empty($errors)) {
-      move_uploaded_file($_FILES['lot-img']['tmp_name'], $file_path . $file_name);
+    if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
+      $file_name = $_FILES['lot-img']['name'];
+      $file_path = __DIR__ . '/uploads/';
+      $file_url = 'uploads/' . $file_name;
+
+      $mymetype = mime_content_type($_FILES['lot-img']['tmp_name']);
+      $mymetype_value = ['image/jpeg', 'image/png'];
+
+      if(!in_array($mymetype, $mymetype_value)) {
+        $file_invalid = 'form__item--invalid';
+        $errors['lot-img'] = 'form__item--invalid';
+      }
+      
+      if (empty($errors)) {
+        move_uploaded_file($_FILES['lot-img']['tmp_name'], $file_path . $file_name);
+      }
     }
-  };
 
 
-
-  foreach($categories as $category) {
-    if ($select_category == $category['name']) {
-      $select_category = $category['id'];
-    }    
-  };
-
-  $date_start = date('Y-m-d H:i:s', time());
-  $user_id = 1;
+    $date_start = date('Y-m-d H:i:s', time());
+    $user_id = 1;
 
 
-  $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
-  $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
-  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
+    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    
 
-
-  if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $form_invalid = !empty($errors) ? 'form--invalid' : '';
     
+    $errors = array_filter($errors); 
+
     foreach($errors as $key => $error) {
       $value_invalid[$key] = 'form__item--invalid';
     };
@@ -114,23 +105,26 @@
       $category_invalid = 'form__item--invalid'; 
     };
 
-    $rate_invalid = invalid('lot-rate');
+    $rate_invalid = validate_price('lot-rate');
 
-    $step_invalid = invalid('lot-step');
+    $step_invalid = validate_price('lot-step');
 
-    $date_invalid = (strtotime($lot_date) < (time() + 86400)) && !is_date_valid($lot_date) ? 'form__item--invalid' : $lot_date;
-    
-    
-    
+    $date_invalid = !is_date_valid($lot_date) && (strtotime($lot_date) < (time() + 86400)) ? 'form__item--invalid' : $lot_date;
+
+
+    $errors = array_filter($errors); 
+
+
+    $prepare = db_get_prepare_stmt($connect, $sql_lot, $data);
+
+    $result_id = get_result_id($prepare, $errors, $connect);
+
     if (empty($errors)) {
-      mysqli_stmt_execute(db_get_prepare_stmt($connect, $sql_lot, $data));
-      $result_id = mysqli_insert_id($connect);
       header("Location: lot.php?id=$result_id");
-    };
-  };
-
-  $errors = array_filter($errors);
-
+    }    
+    
+  }
+  
 
   $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid, 'category_invalid' => $category_invalid]);
 

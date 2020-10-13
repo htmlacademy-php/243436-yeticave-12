@@ -43,7 +43,7 @@
   
   $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name, 'is_auth' => $is_auth, 'user_name' => $user_name]);
 
   echo $layout_content;
   

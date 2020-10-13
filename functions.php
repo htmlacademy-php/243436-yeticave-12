@@ -110,23 +110,25 @@
 
   /**
   * Возвращает id последнего добавленного лота
-  * 
-  * @param mixed $prepare подготовленное выражение на основе готового SQL запроса и переданных данных
-  * @param mixed $errors массив с ошибками валидации
-  * @param mysqli $connect Ресурс соединения
   *
-  * @return integer  id последнего лота
+  * @param $link mysqli Ресурс соединения
+  * @param $sql string SQL запрос с плейсхолдерами вместо значений
+  * @param array $data Данные для вставки на место плейсхолдеров
+  * @param mixed $errors массив с ошибками валидации
+  *
+  * @return integer id лота
   */ 
-  function get_result_id($prepare, $errors, $connect) {
+  function insert_lot($link, $sql, $data = [], $errors) {
+    $prepare = db_get_prepare_stmt($link, $sql, $data);
+
     $result_id = '';
 
     if (empty($errors)) {
       mysqli_stmt_execute($prepare);
-      $result_id = mysqli_insert_id($connect);
+      $result_id = mysqli_insert_id($link);
     }
 
     return $result_id;
   }
-
 
 ?>

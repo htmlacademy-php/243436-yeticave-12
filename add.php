@@ -12,7 +12,22 @@
 
   $categories = get_categories($connect);
 
+  $lot_name = '';
+  $select_category = '';
+  $message = '';
+  $lot_rate = '';
+  $lot_step = '';
+  $lot_date = '';
+  $file_url = '';
 
+  $form_invalid = '';
+  $file_invalid = '';
+  $value_invalid = [];
+  $rate_invalid = '';
+  $step_invalid = '';
+  $date_invalid = '';
+  $category_invalid = '';
+  
 
   if (
     isset($_POST['lot-name']) && 
@@ -57,15 +72,14 @@
       }
     }
 
- 
-
-    $form_invalid = !empty($errors) ? 'form--invalid' : '';
     
-    $errors = array_filter($errors); 
+    $errors = array_filter($errors);
+
 
     foreach($errors as $key => $error) {
       $value_invalid[$key] = 'form__item--invalid';
     };
+
 
     if (empty($_FILES['lot-img']['name'])) {
       $errors['lot-img'] = 'form--invalid';
@@ -83,8 +97,6 @@
 
     $date_invalid = !is_date_valid($lot_date) && (strtotime($lot_date) < (time() + 86400)) ? 'form__item--invalid' : $lot_date;
 
-
-    $errors = array_filter($errors); 
     
     if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
       $file_name = $_FILES['lot-img']['name'];
@@ -105,6 +117,8 @@
     }
 
 
+    $form_invalid = !empty($errors) ? 'form--invalid' : '';
+
     $date_start = date('Y-m-d H:i:s', time());
     $user_id = 1;
 
@@ -114,21 +128,19 @@
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 
-
-    $prepare = db_get_prepare_stmt($connect, $sql_lot, $data);
-
-    $result_id = get_result_id($prepare, $errors, $connect);
+    $lot_id = insert_lot($connect, $sql_lot, $data, $errors);
 
     if (empty($errors)) {
-      header("Location: lot.php?id=$result_id");
+      header("Location: lot.php?id=$lot_id");
     }    
     
   }
   
 
-  $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid, 'category_invalid' => $category_invalid]);
-
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title]);
+  $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid, 'category_invalid' => $category_invalid, 'lot_name' => $lot_name, 'select_category' => $select_category, 'message' => $message, 'lot_rate' => $lot_rate, 'lot_step' => $lot_step, 'lot_date' => $lot_date]);
+  
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth, 'user_name' => $user_name]);
 
   echo $layout_content;
+  
 ?>

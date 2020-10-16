@@ -20,13 +20,7 @@
   $lot_date = '';
   $file_url = '';
 
-  $form_invalid = '';
-  $file_invalid = '';
-  $value_invalid = [];
-  $rate_invalid = '';
-  $step_invalid = '';
-  $date_invalid = '';
-  $category_invalid = '';
+  $errors = [];
   
 
   if (
@@ -44,8 +38,6 @@
     $lot_step = $_POST['lot-step'];
     $lot_date = $_POST['lot-date'];
   
-
-    $errors = [];
 
     $rules = [
       'lot-name' => function() {
@@ -76,26 +68,18 @@
     $errors = array_filter($errors);
 
 
-    foreach($errors as $key => $error) {
-      $value_invalid[$key] = 'form__item--invalid';
-    };
-
-
     if (empty($_FILES['lot-img']['name'])) {
       $errors['lot-img'] = 'form--invalid';
-      $file_invalid = 'form__item--invalid';
     };
 
     if($_POST['category'] == 'Выберите категорию') {
       $errors['category'] = 'form--invalid';
-      $category_invalid = 'form__item--invalid'; 
     };
 
-    $rate_invalid = validate_price('lot-rate');
 
-    $step_invalid = validate_price('lot-step');
+    $errors['lot-date']  = !is_date_valid($_POST['lot-date']) || (strtotime($_POST['lot-date']) < (time() + 86400)) ? 'form--invalid' : '';
 
-    $date_invalid = !is_date_valid($lot_date) && (strtotime($lot_date) < (time() + 86400)) ? 'form__item--invalid' : $lot_date;
+    $errors = array_filter($errors);
 
     
     if(isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
@@ -117,27 +101,21 @@
     }
 
 
-    $form_invalid = !empty($errors) ? 'form--invalid' : '';
-
     $date_start = date('Y-m-d H:i:s', time());
     $user_id = 1;
 
 
     $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
-    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    if (empty($errors)) {  
+      $lot_id = insert_lot($connect, $data);
 
-    $lot_id = insert_lot($connect, $sql_lot, $data, $errors);
-
-    if (empty($errors)) {
       header("Location: lot.php?id=$lot_id");
     }    
     
   }
-  
 
-  $page_content = include_template('add-lot.php', ['categories' => $categories, 'form_invalid' => $form_invalid, 'file_invalid' => $file_invalid, 'value_invalid' => $value_invalid, 'rate_invalid' => $rate_invalid, 'step_invalid' => $step_invalid, 'date_invalid' => $date_invalid, 'category_invalid' => $category_invalid, 'lot_name' => $lot_name, 'select_category' => $select_category, 'message' => $message, 'lot_rate' => $lot_rate, 'lot_step' => $lot_step, 'lot_date' => $lot_date]);
+  $page_content = include_template('add-lot.php', ['categories' => $categories, 'lot_name' => $lot_name, 'select_category' => $select_category, 'message' => $message, 'lot_rate' => $lot_rate, 'lot_step' => $lot_step, 'lot_date' => $lot_date, 'errors' => $errors]);
   
   $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth, 'user_name' => $user_name]);
 

@@ -21,7 +21,7 @@
   *
   * @param string $date будущая дата в формате '2020-10-15'
   *
-  * @return mixed остаток часов и минут
+  * @return array остаток часов и минут
   */
   function get_dt_range (string $date) {
     $future_time = strtotime($date);
@@ -61,7 +61,7 @@
   * 
   * @param mysqli $connect Ресурс соединения
   *
-  * @return mixed список категорий
+  * @return array список категорий
   */  
   function get_categories($connect) {
     $sql_categories = 'SELECT id, name, code FROM category'; 
@@ -83,7 +83,7 @@
   * 
   * @param string $name проверяемое значение
   *
-  * @return string наименование класса для валидации
+  * @return string|null наименование класса для валидации
   */  
   function validateFilled(string $name) {
     if (empty($_POST[$name])) {
@@ -118,15 +118,21 @@
   *
   * @return integer id лота
   */ 
-  function insert_lot($link, $sql, $data = [], $errors) {
-    $prepare = db_get_prepare_stmt($link, $sql, $data);
+  function insert_lot($link, $data = []) {
+    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $prepare = db_get_prepare_stmt($link, $sql_lot, $data);
 
     $result_id = '';
 
-    if (empty($errors)) {
-      mysqli_stmt_execute($prepare);
-      $result_id = mysqli_insert_id($link);
-    }
+    if(!mysqli_stmt_execute($prepare)) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    };
+
+    $result_id = mysqli_insert_id($link);
 
     return $result_id;
   }

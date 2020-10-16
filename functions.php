@@ -1,5 +1,7 @@
 <?php
-
+  /**
+  * @return mysqli Ресурс соединения
+  */
   function db_connect() {
 
     $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
@@ -14,8 +16,14 @@
   }
 
 
-
-  function get_dt_range ($date) {
+  /**
+  * Вовращает остаток времени до будущей даты и добавляет к строке 0, если остаток часов или минут меньше 10
+  *
+  * @param string $date будущая дата в формате '2020-10-15'
+  *
+  * @return array остаток часов и минут
+  */
+  function get_dt_range (string $date) {
     $future_time = strtotime($date);
     $now_time = time();
     $result_time_hour = floor(($future_time - $now_time) / 3600);
@@ -27,11 +35,19 @@
     return [$result_time_hour, $result_time_min];
   };
 
-
-  
-  function get_sum ($cost) {
+  /**
+  * Форматирует число с разделением групп и добавляет занак '₽' к сумме
+  *
+  * Пример использования:
+  * get_sum(10000); // 10 000 ₽
+  * 
+  * @param float $cost число для форматирования
+  *
+  * @return string цена
+  */  
+  function get_sum (float $cost) {
     
-    ceil($cost);
+    $cost = ceil($cost);
   
     if ($cost >= 1000) {
       $cost = number_format($cost, 0, ',', ' ');
@@ -39,11 +55,16 @@
     
     return $cost.' ₽';
   };
-
   
-  
+  /**
+  * Возвращает массив со всеми данным таблицы category из БД
+  * 
+  * @param mysqli $connect Ресурс соединения
+  *
+  * @return array список категорий
+  */  
   function get_categories($connect) {
-    $sql_categories = 'SELECT name, code FROM category'; 
+    $sql_categories = 'SELECT id, name, code FROM category'; 
 
     $result_categories = mysqli_query($connect, $sql_categories);
 
@@ -56,4 +77,64 @@
 
     return $categories;
   }
+
+  /**
+  * Валидация на пустое значение
+  * 
+  * @param string $name проверяемое значение
+  *
+  * @return string|null наименование класса для валидации
+  */  
+  function validateFilled(string $name) {
+    if (empty($_POST[$name])) {
+      return "form--invalid";
+    }
+  }
+
+  /**
+  * Валидация на целое, число которое больше 0
+  * 
+  * @param $price проверяемое значение
+  *
+  * @return string наименование класса для валидации или введенное значение в поле
+  */  
+  function validate_price($price) {
+    $invalid_price = '';
+    
+    if(isset($_POST[$price])) {
+      $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
+    }
+
+    return $invalid_price;
+  }
+
+  /**
+  * Возвращает id последнего добавленного лота
+  *
+  * @param $link mysqli Ресурс соединения
+  * @param $sql string SQL запрос с плейсхолдерами вместо значений
+  * @param array $data Данные для вставки на место плейсхолдеров
+  * @param mixed $errors массив с ошибками валидации
+  *
+  * @return integer id лота
+  */ 
+  function insert_lot($link, $data = []) {
+    $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $prepare = db_get_prepare_stmt($link, $sql_lot, $data);
+
+    $result_id = '';
+
+    if(!mysqli_stmt_execute($prepare)) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    };
+
+    $result_id = mysqli_insert_id($link);
+
+    return $result_id;
+  }
+
 ?>

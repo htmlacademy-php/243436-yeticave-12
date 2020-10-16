@@ -36,7 +36,7 @@ $categories = get_categories($connect);
 
 $page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots]);
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name, 'is_auth' => $is_auth, 'user_name' => $user_name]);
 
 echo $layout_content;
 

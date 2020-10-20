@@ -91,6 +91,19 @@
     }
   }
 
+    /**
+  * Валидация на email
+  * 
+  * @param string $name проверяемое значение
+  *
+  * @return string|null наименование класса для валидации
+  */  
+  function validateEmail(string $name) {
+    if (!filter_input(INPUT_POST, $name, FILTER_VALIDATE_EMAIL)) {
+      return "Введите корректный email";
+    }
+  }
+
   /**
   * Валидация на целое, число которое больше 0
   * 
@@ -136,5 +149,7 @@
 
     return $result_id;
   }
+
+  
 
 ?>

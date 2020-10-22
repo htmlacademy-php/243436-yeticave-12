@@ -58,13 +58,11 @@
     }
 
     if (empty($_POST['email'])) {
-      echo $errors['email'] = 'Введите email';
+      $errors['email'] = 'Введите email';
+    } elseif (check_email($connect, $email)) {
+      $errors['email'] = check_email($connect, $email);
     }
 
-    if(check_email($connect, $email)) {
-      $errors['email'] = check_email($connect, $email);
-    } 
-    
 
     $errors = array_filter($errors);
 

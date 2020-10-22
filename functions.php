@@ -96,7 +96,7 @@
   * 
   * @param string $name проверяемое значение
   *
-  * @return string|null наименование класса для валидации
+  * @return string|null возвращает ошибку, если email не корректный
   */  
   function validateEmail($name) {
     if (!filter_input(INPUT_POST, $name, FILTER_VALIDATE_EMAIL)) {
@@ -149,12 +149,12 @@
   }
 
   /**
-  * Возвращает id последнего добавленного лота
+  * Проверяет существование email в БД
   *
   * @param $link mysqli Ресурс соединения
   * @param string $data Данные для вставки на место плейсхолдеров
   *
-  * @return integer id лота
+  * @return string|null возвращает ошибку, если email есть в БД
   */ 
   function check_email($link, $data) {
     $errors = '';
@@ -172,6 +172,7 @@
     if(!$result_email) {
         $error = mysqli_error($link);
         echo 'Ошибка MySQL: '.$error;
+        die();
     }
 
     if(mysqli_num_rows($result_email)) {
@@ -183,12 +184,11 @@
 
 
   /**
-  * Возвращает id последнего добавленного лота
+  * Добавление пользователя
   *
   * @param $link mysqli Ресурс соединения
   * @param array $data Данные для вставки на место плейсхолдеров
   *
-  * @return integer id лота
   */ 
   function insert_user($link, $data = []) {
 
@@ -202,8 +202,6 @@
       echo 'Ошибка MySQL: '.$error;
       die();
     };
-
-    return $prepare;
   }
   
 

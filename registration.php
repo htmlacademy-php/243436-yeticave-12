@@ -57,47 +57,27 @@
       }
     }
 
+    if (empty($_POST['email'])) {
+      echo $errors['email'] = 'Введите email';
+    }
+
+    if(check_email($connect, $email)) {
+      $errors['email'] = check_email($connect, $email);
+    } 
+    
+
     $errors = array_filter($errors);
-
-
-    $sql_email = 'SELECT email FROM user';
-
-    $result_email = mysqli_query($connect, $sql_email);
-
-    if(!$result_email) {
-        $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
-    }
-
-    $emails = mysqli_fetch_all($result_email, MYSQLI_ASSOC);
-
-    foreach($emails as $value) {
-      if($value['email'] == $_POST['email']) {
-        $errors['email'] = 'Введите корректный email';
-      }
-    }
 
 
     $created_at = date('Y-m-d H:i:s', time());    
 
-    
 
     if (empty($errors)) {
       $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
       
       $data = [$created_at, $email, $first_name, $password, $message];
-      
-      $sql_user = "INSERT INTO user(created_at, email, name, password, contact) 
-      VALUES(?, ?, ?, ?, ?)";
 
-      $prepare = db_get_prepare_stmt($connect, $sql_user, $data);
-
-
-      if(!mysqli_stmt_execute($prepare)) {
-        $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
-        die();
-      };
+      insert_user($connect, $data);
 
       header("Location: index.php");
     }

@@ -98,7 +98,7 @@
   *
   * @return string|null наименование класса для валидации
   */  
-  function validateEmail(string $name) {
+  function validateEmail($name) {
     if (!filter_input(INPUT_POST, $name, FILTER_VALIDATE_EMAIL)) {
       return "Введите корректный email";
     }
@@ -125,9 +125,7 @@
   * Возвращает id последнего добавленного лота
   *
   * @param $link mysqli Ресурс соединения
-  * @param $sql string SQL запрос с плейсхолдерами вместо значений
   * @param array $data Данные для вставки на место плейсхолдеров
-  * @param mixed $errors массив с ошибками валидации
   *
   * @return integer id лота
   */ 
@@ -150,6 +148,63 @@
     return $result_id;
   }
 
+  /**
+  * Возвращает id последнего добавленного лота
+  *
+  * @param $link mysqli Ресурс соединения
+  * @param string $data Данные для вставки на место плейсхолдеров
+  *
+  * @return integer id лота
+  */ 
+  function check_email($link, $data) {
+    $errors = '';
+
+    $sql_email = "SELECT email FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($link, $sql_email);
+
+    mysqli_stmt_bind_param($stmt, 's', $data);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_email = mysqli_stmt_get_result($stmt);
+
+    if(!$result_email) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: '.$error;
+    }
+
+    if(mysqli_num_rows($result_email)) {
+      $errors = 'Данный email уже используется';
+    };
+
+    return $errors;
+  }
+
+
+  /**
+  * Возвращает id последнего добавленного лота
+  *
+  * @param $link mysqli Ресурс соединения
+  * @param array $data Данные для вставки на место плейсхолдеров
+  *
+  * @return integer id лота
+  */ 
+  function insert_user($link, $data = []) {
+
+    $sql_user = "INSERT INTO user(created_at, email, name, password, contact) 
+      VALUES(?, ?, ?, ?, ?)";
+
+    $prepare = db_get_prepare_stmt($link, $sql_user, $data);
+
+    if(!mysqli_stmt_execute($prepare)) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    };
+
+    return $prepare;
+  }
   
 
 ?>

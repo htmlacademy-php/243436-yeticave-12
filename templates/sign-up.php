@@ -13,7 +13,7 @@
       <div class="form__item <?= $errors['email'] ? 'form__item--invalid' : ''; ?>">
         <label for="email">E-mail <sup>*</sup></label>
         <input id="email" type="text" name="email" placeholder="Введите e-mail" value="<?= htmlspecialchars($email); ?>">
-        <span class="form__error">Введите e-mail</span>
+        <span class="form__error"><?= $errors['email']; ?></span>
       </div>
       <div class="form__item <?= $errors['password'] ? 'form__item--invalid' : ''; ?>">
         <label for="password">Пароль <sup>*</sup></label>

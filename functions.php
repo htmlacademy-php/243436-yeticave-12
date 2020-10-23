@@ -1,7 +1,7 @@
 <?php
   /**
-  * @return mysqli Ресурс соединения
-  */
+   * @return mysqli Ресурс соединения
+   */
   function db_connect() {
 
     $connect = mysqli_connect('localhost', 'root', 'root', 'yeticave');
@@ -17,12 +17,12 @@
 
 
   /**
-  * Вовращает остаток времени до будущей даты и добавляет к строке 0, если остаток часов или минут меньше 10
-  *
-  * @param string $date будущая дата в формате '2020-10-15'
-  *
-  * @return array остаток часов и минут
-  */
+   * Вовращает остаток времени до будущей даты и добавляет к строке 0, если остаток часов или минут меньше 10
+   *
+   * @param string $date будущая дата в формате '2020-10-15'
+   *
+   * @return array остаток часов и минут
+   */
   function get_dt_range (string $date) {
     $future_time = strtotime($date);
     $now_time = time();
@@ -36,15 +36,15 @@
   };
 
   /**
-  * Форматирует число с разделением групп и добавляет занак '₽' к сумме
-  *
-  * Пример использования:
-  * get_sum(10000); // 10 000 ₽
-  * 
-  * @param float $cost число для форматирования
-  *
-  * @return string цена
-  */  
+   * Форматирует число с разделением групп и добавляет занак '₽' к сумме
+   *
+   * Пример использования:
+   * get_sum(10000); // 10 000 ₽
+   * 
+   * @param float $cost число для форматирования
+   *
+   * @return string цена
+   */  
   function get_sum (float $cost) {
     
     $cost = ceil($cost);
@@ -57,12 +57,12 @@
   };
   
   /**
-  * Возвращает массив со всеми данным таблицы category из БД
-  * 
-  * @param mysqli $connect Ресурс соединения
-  *
-  * @return array список категорий
-  */  
+   * Возвращает массив со всеми данным таблицы category из БД
+   * 
+   * @param mysqli $connect Ресурс соединения
+   *
+   * @return array список категорий
+   */  
   function get_categories($connect) {
     $sql_categories = 'SELECT id, name, code FROM category'; 
 
@@ -79,25 +79,25 @@
   }
 
   /**
-  * Валидация на пустое значение
-  * 
-  * @param string $name проверяемое значение
-  *
-  * @return string|null наименование класса для валидации
-  */  
+   * Валидация на пустое значение
+   * 
+   * @param string $name проверяемое значение
+   *
+   * @return string|null наименование класса для валидации
+   */  
   function validateFilled(string $name) {
     if (empty($_POST[$name])) {
       return "form--invalid";
     }
   }
 
-    /**
-  * Валидация на email
-  * 
-  * @param string $name проверяемое значение
-  *
-  * @return string|null возвращает ошибку, если email не корректный
-  */  
+  /**
+   * Валидация на email
+   * 
+   * @param string $name проверяемое значение
+   *
+   * @return string|null возвращает ошибку, если email не корректный
+   */  
   function validateEmail($name) {
     if (!filter_input(INPUT_POST, $name, FILTER_VALIDATE_EMAIL)) {
       return "Введите корректный email";
@@ -105,12 +105,12 @@
   }
 
   /**
-  * Валидация на целое, число которое больше 0
-  * 
-  * @param $price проверяемое значение
-  *
-  * @return string наименование класса для валидации или введенное значение в поле
-  */  
+   * Валидация на целое, число которое больше 0
+   * 
+   * @param $price проверяемое значение
+   *
+   * @return string наименование класса для валидации или введенное значение в поле
+   */  
   function validate_price($price) {
     $invalid_price = '';
     
@@ -122,13 +122,13 @@
   }
 
   /**
-  * Возвращает id последнего добавленного лота
-  *
-  * @param $link mysqli Ресурс соединения
-  * @param array $data Данные для вставки на место плейсхолдеров
-  *
-  * @return integer id лота
-  */ 
+   * Возвращает id последнего добавленного лота
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param array $data Данные для вставки на место плейсхолдеров
+   *
+   * @return integer id лота
+   */ 
   function insert_lot($link, $data = []) {
     $sql_lot = "INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -149,13 +149,13 @@
   }
 
   /**
-  * Проверяет существование email в БД
-  *
-  * @param $link mysqli Ресурс соединения
-  * @param string $data Данные для вставки на место плейсхолдеров
-  *
-  * @return string|null возвращает ошибку, если email есть в БД
-  */ 
+   * Возвращает ошибку, если email уже используется на сайте
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param string $data email, который нужно проверить
+   *
+   * @return string|null возвращает ошибку, если email есть в БД
+   */ 
   function check_email($link, $data) {
     $errors = '';
 
@@ -184,12 +184,11 @@
 
 
   /**
-  * Добавление пользователя
-  *
-  * @param $link mysqli Ресурс соединения
-  * @param array $data Данные для вставки на место плейсхолдеров
-  *
-  */ 
+   * Добавление пользователя
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param array $data Данные для вставки на место плейсхолдеров
+   */ 
   function insert_user($link, $data = []) {
 
     $sql_user = "INSERT INTO user(created_at, email, name, password, contact) 

@@ -1,11 +1,16 @@
 <?php
-
+  session_start();
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = rand(0, 1);
+  // $is_auth = rand(0, 1);
 
-  $user_name = 'Павел';
+  // $user_name = 'Павел';
+
+  if (isset($_SESSION['auth'])) {
+    http_response_code(403);
+    die();
+  };
 
   $title = 'Регистрация';
 
@@ -77,7 +82,7 @@
 
       insert_user($connect, $data);
 
-      header("Location: index.php");
+      header("Location: user-login.php");
     }
 
   }
@@ -86,7 +91,7 @@
 
   $page_content = include_template('sign-up.php', ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password, 'first_name' => $first_name, 'message' => $message]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth, 'user_name' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title]);
 
   echo $layout_content;
 

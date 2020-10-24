@@ -1,11 +1,15 @@
 <?php
+  session_start();
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = rand(0, 1);
-  
-  $user_name = 'Павел';
+  // $is_auth = rand(0, 1);
 
+  $user_name = '';
+
+  if(isset($_SESSION['name'])) {
+      $user_name = $_SESSION['name'];
+  } 
 
   $connect = db_connect();
 
@@ -36,6 +40,8 @@
   };
 
   $lot = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+
+  $title = htmlspecialchars($lot[0]['title']); 
   
   $categories = get_categories($connect);
 
@@ -43,7 +49,7 @@
   
   $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $user_name, 'is_auth' => $is_auth, 'user_name' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name]);
 
   echo $layout_content;
   

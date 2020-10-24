@@ -182,6 +182,149 @@
     return $errors;
   }
 
+  /**
+   * Возвращает хэш проверяемого пароля
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param string $data email, по которому подбираем хэш пароля
+   *
+   * @return string возвращает хэш пароля
+   */ 
+  function get_hash_password($link, $data) {
+    $sql_email = "SELECT email FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($link, $sql_email);
+
+    mysqli_stmt_bind_param($stmt, 's', $data);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_email = mysqli_stmt_get_result($stmt);
+
+    if(!$result_email) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: '.$error;
+        die();
+    }
+
+    $fetch_email = mysqli_fetch_assoc($result_email);
+
+    $received_email = $fetch_email['email'];
+
+
+    $sql_password = "SELECT password FROM user WHERE email = "."'".$received_email."'";
+
+    $result_password = mysqli_query($link, $sql_password);
+
+    if(!$result_password) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    }
+
+    $fetch_password = mysqli_fetch_assoc($result_password);
+
+    $fetch_password = $fetch_password['password'];
+
+    return $fetch_password;
+  }
+
+
+  /**
+   * Возвращает имя пользователя
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param string $data email, по которому подбираем имя пользователя
+   *
+   * @return string возвращает имя пользователя
+   */ 
+  function get_name_user($link, $data) {
+    $sql_email = "SELECT email FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($link, $sql_email);
+
+    mysqli_stmt_bind_param($stmt, 's', $data);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_email = mysqli_stmt_get_result($stmt);
+
+    if(!$result_email) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: '.$error;
+        die();
+    }
+
+    $fetch_email = mysqli_fetch_assoc($result_email);
+
+    $received_email = $fetch_email['email'];
+
+
+    $sql_name = "SELECT name FROM user WHERE email = "."'".$received_email."'";
+
+    $result_name = mysqli_query($link, $sql_name);
+
+    if(!$result_name) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    }
+
+    $fetch_name = mysqli_fetch_assoc($result_name);
+
+    $fetch_name = $fetch_name['name'];
+
+    return $fetch_name;
+  }
+
+
+  /**
+   * Возвращает id пользователя
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param string $data email, по которому подбираем id пользователя
+   *
+   * @return string возвращает id пользователя
+   */ 
+  function get_id_user($link, $data) {
+    $sql_email = "SELECT email FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($link, $sql_email);
+
+    mysqli_stmt_bind_param($stmt, 's', $data);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_email = mysqli_stmt_get_result($stmt);
+
+    if(!$result_email) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: '.$error;
+        die();
+    }
+
+    $fetch_email = mysqli_fetch_assoc($result_email);
+
+    $received_email = $fetch_email['email'];
+
+
+    $sql_id = "SELECT id FROM user WHERE email = "."'".$received_email."'";
+
+    $result_id = mysqli_query($link, $sql_id);
+
+    if(!$result_id) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    }
+
+    $fetch_id = mysqli_fetch_assoc($result_id);
+
+    $fetch_id = $fetch_id['id'];
+
+    return $fetch_id;
+  }
+
 
   /**
    * Добавление пользователя

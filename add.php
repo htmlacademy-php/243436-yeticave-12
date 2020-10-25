@@ -3,13 +3,14 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  // $is_auth = rand(0, 1);
+  $is_auth = '';
 
   $user_name = '';
 
-  if(isset($_SESSION['name'])) {
+  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
       $user_name = $_SESSION['name'];
-  } 
+      $is_auth = $_SESSION['auth'];
+  }
 
   if (!isset($_SESSION['auth'])) {
     http_response_code(403);
@@ -129,7 +130,7 @@
 
   $page_content = include_template('add-lot.php', ['categories' => $categories, 'lot_name' => $lot_name, 'select_category' => $select_category, 'message' => $message, 'lot_rate' => $lot_rate, 'lot_step' => $lot_step, 'lot_date' => $lot_date, 'errors' => $errors]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
   

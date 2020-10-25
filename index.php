@@ -3,12 +3,13 @@ session_start();
 require_once('helpers.php');
 require_once('functions.php');
 
-// $is_auth = rand(0, 1);
+$is_auth = '';
 
 $user_name = '';
 
-if(isset($_SESSION['name'])) {
+if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = $_SESSION['name'];
+    $is_auth = $_SESSION['auth'];
 }
 
 $title = 'Главная';
@@ -40,7 +41,7 @@ $categories = get_categories($connect);
 
 $page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots]);
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
 echo $layout_content;
 

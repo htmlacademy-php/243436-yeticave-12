@@ -3,9 +3,7 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  // $is_auth = rand(0, 1);
-
-  // $user_name = 'Павел';
+  $is_auth = '';
 
   if (isset($_SESSION['auth'])) {
     http_response_code(403);
@@ -91,7 +89,7 @@
 
   $page_content = include_template('sign-up.php', ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password, 'first_name' => $first_name, 'message' => $message]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth]);
 
   echo $layout_content;
 

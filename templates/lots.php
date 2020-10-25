@@ -19,7 +19,7 @@
             <p class="lot-item__description"><?= htmlspecialchars($lot[0]['description']); ?></p>
           </div>
           <div class="lot-item__right">
-            <?php if (isset($_SESSION['auth'])): ?>
+            <?php if ($is_auth): ?>
               <div class="lot-item__state">
                 <div class="lot-item__timer timer <? [$hours, $minutes] = get_dt_range($lot[0]['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
                   <? 

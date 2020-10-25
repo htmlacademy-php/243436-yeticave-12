@@ -3,12 +3,13 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  // $is_auth = rand(0, 1);
+  $is_auth = '';
 
   $user_name = '';
 
-  if(isset($_SESSION['name'])) {
+  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
       $user_name = $_SESSION['name'];
+      $is_auth = $_SESSION['auth'];
   } 
 
   $connect = db_connect();
@@ -47,9 +48,9 @@
 
 
   
-  $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot]);
+  $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot, 'is_auth' => $is_auth]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
   

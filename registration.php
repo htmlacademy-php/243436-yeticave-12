@@ -3,7 +3,7 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = '';
+  $is_auth = false;
 
   if (isset($_SESSION['auth'])) {
     http_response_code(403);

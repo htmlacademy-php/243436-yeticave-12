@@ -1,14 +1,27 @@
 <?php
+  session_start();
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = rand(0, 1);
+  $is_auth = false;
 
-  $user_name = 'Павел';
+  $user_name = '';
+
+  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+      $user_name = $_SESSION['name'];
+      $is_auth = $_SESSION['auth'];
+  }
+
+  if (!isset($_SESSION['auth'])) {
+    http_response_code(403);
+    die();
+  };
 
   $title = 'Добавление лота';
 
   $connect = db_connect();
+
+  
 
   $categories = get_categories($connect);
 
@@ -102,7 +115,7 @@
 
 
     $date_start = date('Y-m-d H:i:s', time());
-    $user_id = 1;
+    $user_id = $_SESSION['id'];
 
 
     $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
@@ -117,7 +130,7 @@
 
   $page_content = include_template('add-lot.php', ['categories' => $categories, 'lot_name' => $lot_name, 'select_category' => $select_category, 'message' => $message, 'lot_rate' => $lot_rate, 'lot_step' => $lot_step, 'lot_date' => $lot_date, 'errors' => $errors]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth, 'user_name' => $user_name]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
   

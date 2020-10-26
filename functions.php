@@ -182,7 +182,42 @@
     return $errors;
   }
 
+  /**
+   * Возвращает массив данных пользователя
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param string $data email, по которому подбираем данные пользователя
+   *
+   * @return array|null возвращает данные пользователя
+   */ 
+  function get_data_user($link, $data) {
 
+    $sql_data_user = "SELECT id, name, password FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($link, $sql_data_user);
+
+    mysqli_stmt_bind_param($stmt, 's', $data);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_data_user = mysqli_stmt_get_result($stmt);
+
+    if(!$result_data_user) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    }
+
+    $fetch_data_user = mysqli_fetch_all($result_data_user, MYSQLI_ASSOC);
+
+    if($fetch_data_user == []) {
+      $fetch_data_user = null;
+    }
+     
+    return $fetch_data_user;
+  }
+
+  
   /**
    * Добавление пользователя
    *

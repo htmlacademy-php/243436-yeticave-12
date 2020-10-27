@@ -45,3 +45,5 @@ ALTER TABLE lot ADD FOREIGN KEY (category_id) REFERENCES category(id);
 
 ALTER TABLE rate ADD FOREIGN KEY (user_id) REFERENCES user(id);
 ALTER TABLE rate ADD FOREIGN KEY (lot_id) REFERENCES lot(id);
+
+CREATE FULLTEXT INDEX lot_search ON lot(title, description);

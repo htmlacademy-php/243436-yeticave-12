@@ -4,6 +4,7 @@
   require_once('functions.php');
 
   $is_auth = false;
+  $search = '';
 
   if (isset($_SESSION['auth'])) {
     http_response_code(403);
@@ -89,7 +90,7 @@
 
   $page_content = include_template('sign-up.php', ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password, 'first_name' => $first_name, 'message' => $message]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth, 'search' => $search]);
 
   echo $layout_content;
 

@@ -11,8 +11,8 @@
     <div class="container">
       <section class="lots">
         <h2>Результаты поиска по запросу «<span><?= htmlspecialchars($search); ?></span>»</h2>
+        <?php if(!empty($lots)) : ?>
         <ul class="lots__list">
-          <?php if(!empty($lots)) : ?>
             <?php foreach ($lots as $key => $value): ?>
               <li class="lots__item lot">
                 <div class="lot__image">
@@ -35,10 +35,10 @@
                 </div>
               </li>
             <?php endforeach; ?>
-            <?php else : ?>
-              <p>Ничего не найдено по вашему запросу</p>  
-          <?php endif; ?>
         </ul>
+        <?php else : ?>
+          <p>Ничего не найдено по вашему запросу</p>  
+        <?php endif; ?>
       </section>
       <?php if($pages_count > 1) : ?>
         <ul class="pagination-list">

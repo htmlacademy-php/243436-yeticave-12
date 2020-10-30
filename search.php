@@ -13,6 +13,8 @@
 
   $categories = get_categories($connect);
 
+  $lots = '';
+
   $search = '';
 
   $back_page = '';
@@ -77,8 +79,6 @@
     }
 
     $lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
-
-
   }
 
   $page_content = include_template('search-result.php', ['categories' => $categories, 'lots' => $lots, 'search' => $search, 'pages_count' => $pages_count, 'pages' => $pages, 'cur_page' => $cur_page, 'back_page' => $back_page]);

@@ -16,7 +16,6 @@
 
   $email = '';
   $password = '';
-  $search = '';
 
 
   $errors = [];
@@ -63,7 +62,7 @@
 
   $page_content = include_template('login.php', ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password]);
   
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth, 'search' => $search]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
 

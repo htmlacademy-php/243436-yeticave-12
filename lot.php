@@ -6,7 +6,7 @@
   $is_auth = false;
 
   $user_name = '';
-  $search = '';
+
 
   if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
       $user_name = $_SESSION['name'];
@@ -51,7 +51,7 @@
   
   $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot, 'is_auth' => $is_auth]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth, 'search' => $search]);
+  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
   

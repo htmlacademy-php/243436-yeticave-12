@@ -7,6 +7,7 @@
 
   $user_name = '';
 
+
   if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
       $user_name = $_SESSION['name'];
       $is_auth = $_SESSION['auth'];

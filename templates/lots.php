@@ -22,8 +22,17 @@
             <?php if ($is_auth): ?>
               <div class="lot-item__state">
                 <div class="lot-item__timer timer <? [$hours, $minutes] = get_dt_range($lot[0]['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
-                  <? 
-                    echo "{$hours}:{$minutes}";
+                  <?
+                    if($hours <= 0 && $minutes <= 0) {
+                      $hours = 0;
+                      $minutes = 0;
+                      
+                      [$hours, $minutes] = [str_pad($hours, 2, "0", STR_PAD_LEFT), str_pad($minutes, 2, "0", STR_PAD_LEFT)];
+                      echo "{$hours}:{$minutes}";
+                    } else {                   
+                      echo "{$hours}:{$minutes}";
+                    }
+                    
                   ?>
                 </div>
                 <div class="lot-item__cost-state">
@@ -33,9 +42,29 @@
                   </div>
                   <div class="lot-item__min-cost">
                     Мин. ставка 
-                    <span><?= (htmlspecialchars(get_sum($lot[0]['current_price'] + $lot[0]['rate_step'])));?></span>
+                    <span><?= htmlspecialchars(get_sum($lot[0]['current_price'] + $lot[0]['rate_step'])); ?></span>
                   </div>
                 </div>
+                  <form class="lot-item__form" action="lot.php?id=<?= $id; ?>" method="post" autocomplete="off" <?php if($hours <= 0 && $minutes <= 0) : ?> style="display: none;" <?php endif; ?> >
+                  <p class="lot-item__form-item form__item <?= $errors['cost'] ? $errors['cost'] : ''; ?>">
+                    <label for="cost">Ваша ставка</label>
+                    <input id="cost" type="text" name="cost" placeholder="12 000" value="<?= htmlspecialchars($cost); ?>">
+                    <span class="form__error">Введите ставку лота</span>
+                  </p>
+                  <button type="submit" class="button">Сделать ставку</button>
+                </form>
+              </div>
+              <div class="history">
+                <h3>История ставок (<span><?= $rate_count; ?></span>)</h3>
+                <table class="history__list">
+                  <?php foreach($rates as $rate) : ?>
+                    <tr class="history__item">
+                      <td class="history__name"><?= htmlspecialchars($rate['name']); ?></td>
+                      <td class="history__price"><?= htmlspecialchars(get_rate($rate['cost'])); ?></td>
+                      <td class="history__time"><?= get_time_rate(htmlspecialchars($rate['date'])); ?></td>
+                    </tr>
+                  <?php endforeach; ?>
+                </table>
               </div>
             <?php endif; ?>       
           </div>

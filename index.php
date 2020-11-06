@@ -8,6 +8,7 @@ $is_auth = false;
 $user_name = '';
 $search = '';
 
+
 if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = $_SESSION['name'];
     $is_auth = $_SESSION['auth'];

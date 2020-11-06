@@ -19,9 +19,10 @@
             <p class="lot-item__description"><?= htmlspecialchars($lot[0]['description']); ?></p>
           </div>
           <div class="lot-item__right">
-            <?php if ($is_auth): ?>
+            <?php [$hours, $minutes] = get_dt_range($lot[0]['date_finish']); 
+            if ($is_auth && ($hours > 0 || $minutes > 0) && empty($errors_user) && $rate_user_id != $_SESSION['id'])  : ?>
               <div class="lot-item__state">
-                <div class="lot-item__timer timer <? [$hours, $minutes] = get_dt_range($lot[0]['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
+                <div class="lot-item__timer timer <? if ($hours == 0) : ?> timer--finishing <? endif;?>">
                   <?
                     if($hours <= 0 && $minutes <= 0) {
                       $hours = 0;
@@ -45,7 +46,7 @@
                     <span><?= htmlspecialchars(get_sum($lot[0]['current_price'] + $lot[0]['rate_step'])); ?></span>
                   </div>
                 </div>
-                  <form class="lot-item__form" action="lot.php?id=<?= $id; ?>" method="post" autocomplete="off" <?php if($hours <= 0 && $minutes <= 0) : ?> style="display: none;" <?php endif; ?> >
+                  <form class="lot-item__form" action="lot.php?id=<?= $id; ?>" method="post" autocomplete="off">
                   <p class="lot-item__form-item form__item <?= $errors['cost'] ? $errors['cost'] : ''; ?>">
                     <label for="cost">Ваша ставка</label>
                     <input id="cost" type="text" name="cost" placeholder="12 000" value="<?= htmlspecialchars($cost); ?>">
@@ -54,6 +55,7 @@
                   <button type="submit" class="button">Сделать ставку</button>
                 </form>
               </div>
+            <?php endif; ?> 
               <div class="history">
                 <h3>История ставок (<span><?= $rate_count; ?></span>)</h3>
                 <table class="history__list">
@@ -65,8 +67,7 @@
                     </tr>
                   <?php endforeach; ?>
                 </table>
-              </div>
-            <?php endif; ?>       
+              </div>      
           </div>
         </div>       
     </section>

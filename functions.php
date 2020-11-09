@@ -28,11 +28,13 @@
     $now_time = time();
     $result_time_hour = floor(($future_time - $now_time) / 3600);
     $result_time_min = floor((($future_time - $now_time) % 3600)/60);
+    $result_time_sec = floor((($future_time - $now_time) % 3600)%60);
   
-    $result_time_min = str_pad($result_time_min, 2, "0", STR_PAD_LEFT);;
-    $result_time_hour = str_pad($result_time_hour, 2, "0", STR_PAD_LEFT);;
+    $result_time_min = str_pad($result_time_min, 2, "0", STR_PAD_LEFT);
+    $result_time_hour = str_pad($result_time_hour, 2, "0", STR_PAD_LEFT);
+    $result_time_sec = str_pad($result_time_sec, 2, "0", STR_PAD_LEFT);
   
-    return [$result_time_hour, $result_time_min];
+    return [$result_time_hour, $result_time_min, $result_time_sec];
   };
 
   /**
@@ -54,6 +56,27 @@
     }
     
     return $cost.' ₽';
+  };
+
+  /**
+   * Форматирует число с разделением групп и добавляет занак 'р' к сумме
+   *
+   * Пример использования:
+   * get_sum(10000); // 10 000 р
+   * 
+   * @param float $cost число для форматирования
+   *
+   * @return string цена
+   */  
+  function get_rate (float $cost) {
+    
+    $cost = ceil($cost);
+  
+    if ($cost >= 1000) {
+      $cost = number_format($cost, 0, ',', ' ');
+    }
+    
+    return $cost.' р';
   };
   
   /**
@@ -236,6 +259,55 @@
       echo 'Ошибка MySQL: '.$error;
       die();
     };
+  }
+
+  /**
+   * Добавление  ставки
+   *
+   * @param $link mysqli Ресурс соединения
+   * @param array $data Данные для вставки на место плейсхолдеров
+   */ 
+  function insert_rate($link, $data = []) {
+
+    $sql_rate = "INSERT INTO rate(date, cost, user_id, lot_id) 
+    VALUES(?, ?, ?, ?)";
+
+    $prepare = db_get_prepare_stmt($link, $sql_rate, $data);
+
+    if(!mysqli_stmt_execute($prepare)) {
+      $error = mysqli_error($link);
+      echo 'Ошибка MySQL: '.$error;
+      die();
+    };
+  }
+
+  /**
+   * Время добавления ставки
+   *
+   * @param string $rate_time дата добавления ставки
+   * 
+   * @return string возвращает время, которое прошло с добавления ставки
+   */
+  function get_time_rate($rate_time) {
+    $time_public = '';
+    $now_time = time();
+    $past_time = strtotime($rate_time);
+    $result_time_hour = floor(($now_time - $past_time) / 3600);
+    $result_time_min = floor((($now_time - $past_time) % 3600)/60);
+    $result_time_sec = floor((($now_time - $past_time) % 3600)%60);
+    $result_all_second = $now_time - $past_time;
+  
+
+    if($result_time_hour == 0 && $result_time_min == 0 && $result_time_sec < 60) {
+      $time_public = 'только что';
+    } elseif($result_time_hour == 0 && $result_time_min < 60 && $result_time_min >= 1) {
+      $time_public = $result_time_min. get_noun_plural_form($result_time_min, ' минуту', ' минуты', ' минут', ' минута').' назад';
+    } elseif($result_time_hour >= 1 && $result_all_second < 7200) {
+      $time_public = 'Час назад';
+    } elseif($result_all_second >= 7200) {
+      $time_public = date('d.m.y', $past_time).' в '.date('H:i', $past_time);
+    }
+    return $time_public;
   }
   
 

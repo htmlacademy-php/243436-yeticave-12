@@ -2,29 +2,58 @@
 session_start();
 require_once('helpers.php');
 require_once('functions.php');
+require_once('getwinner.php');
 
-$is_auth = false;
+
+$connect = db_connect();
+
+
+$title = 'Главная';
+
 
 $user_name = '';
-$search = '';
 
+$back_page = '';
+
+
+$is_auth = false;
 
 if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = $_SESSION['name'];
     $is_auth = $_SESSION['auth'];
 }
 
-$title = 'Главная';
 
-$connect = db_connect();
+$categories = get_categories($connect);
 
-$sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+
+$sql_lots = "SELECT COUNT(*) as count FROM lot WHERE date_finish > NOW()";
+
+$result_lots = mysqli_query($connect, $sql_lots);
+
+if(!$result_lots) {
+    $error = mysqli_error($connect);
+    echo 'Ошибка MySQL: '.$error;
+}    
+
+$lots = mysqli_fetch_assoc($result_lots)['count'];
+
+$cur_page = $_GET['page'] ?? 1;
+$page_items = 9;
+
+$pages_count = ceil($lots/$page_items);
+
+$offset = ($cur_page - 1) * $page_items;
+
+$pages = range(1, $pages_count);
+
+$sql_lots = "SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot 
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id
             WHERE date_finish > NOW()
             GROUP BY lot.id
-            ORDER BY lot.date_start DESC';
+            ORDER BY lot.date_start DESC LIMIT ".$page_items." OFFSET ".$offset;
 
 $result_lots = mysqli_query($connect, $sql_lots);
 
@@ -36,14 +65,9 @@ if(!$result_lots) {
 $lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
 
+$page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots, 'pages_count' => $pages_count, 'pages' => $pages, 'cur_page' => $cur_page, 'back_page' => $back_page]);
 
-$categories = get_categories($connect);
-
-
-
-$page_content = include_template('main.php', ['categories' => $categories, 'lots' => $lots]);
-
-$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth, 'search' => $search]);
+$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
 echo $layout_content;
 

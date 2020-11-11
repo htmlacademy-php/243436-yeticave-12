@@ -3,23 +3,26 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = false;
-
-  $user_name = '';
-
-  $title = 'Вход';
 
   $connect = db_connect();
 
-  $categories = get_categories($connect);
 
+  $title = 'Вход';
+
+
+  $user_name = '';
 
   $email = '';
   $password = '';
 
-
   $errors = [];
+
+
+  $is_auth = false;
+
   
+  $categories = get_categories($connect);
+
 
   if (
     isset($_POST['email']) && 
@@ -55,9 +58,7 @@
       $_SESSION['id'] = $user_id;
       header("Location: index.php");
       die();
-    }
-
-  
+    }  
   }
 
   $page_content = include_template('login.php', ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password]);

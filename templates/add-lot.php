@@ -1,11 +1,11 @@
 <main>
   <nav class="nav">
     <ul class="nav__list container">
-      <?php foreach ($categories as $category): ?>
-        <li class="nav__item">
-          <a href="all-lots.html"><?= htmlspecialchars($category['name']); ?></a>
-        </li>
-      <?php endforeach; ?>  
+        <?php foreach ($categories as $category): ?>
+          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
+            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
+          </li>
+        <?php endforeach; ?> 
     </ul>
   </nav>
   <form class="form form--add-lot container <?= !empty($errors) ? 'form--invalid' : '' ?>" action="add.php" method="post" enctype="multipart/form-data">

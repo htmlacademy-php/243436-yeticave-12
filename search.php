@@ -3,26 +3,29 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = false;
-
-  $user_name = '';
-
-  $title = 'Поиск';
 
   $connect = db_connect();
 
-  $categories = get_categories($connect);
+
+  $title = 'Поиск';
+
+
+  $user_name = '';
 
   $lots = '';
-
   $search = '';
-
   $back_page = '';
+
+
+  $is_auth = false;
 
   if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = $_SESSION['name'];
     $is_auth = $_SESSION['auth'];
   }
+
+
+  $categories = get_categories($connect);
 
 
   if (

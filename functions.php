@@ -101,6 +101,33 @@
     return $categories;
   }
 
+    /**
+   * Возвращает массив завершенных лотов
+   * 
+   * @param mysqli $connect Ресурс соединения
+   * @param integer $user_id Id пользователя
+   *
+   * @return array список завершенных лотов
+   */  
+  function get_lots_finish($connect, $user_id) {
+    $sql_lot_finish = "SELECT rate.user_id AS user_id, rate.lot_id AS lot_id, MAX(rate.cost) AS rate_cost, lot.date_finish AS lot_date_finish, lot.winner_id AS winner_id 
+	FROM rate
+		JOIN lot ON lot.id = rate.lot_id  
+		WHERE rate.user_id = $user_id AND lot.date_finish < NOW()
+    GROUP BY rate.lot_id";
+    
+    $result_lot_finish = mysqli_query($connect, $sql_lot_finish);
+
+    if(!$result_lot_finish) {
+        $error = mysqli_error($connect);
+        echo 'Ошибка MySQL: '.$error;
+    }
+  
+    $lots_finish = mysqli_fetch_all($result_lot_finish, MYSQLI_ASSOC);
+
+    return $lots_finish;
+  }
+
   /**
    * Валидация на пустое значение
    * 

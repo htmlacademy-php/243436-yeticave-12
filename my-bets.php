@@ -42,27 +42,6 @@
 
   $rates = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
 
-
-  $lots_finish = get_lots_finish($connect, $user_id);
-
-  foreach($lots_finish as $lot_finish) {
-    $user = $lot_finish['user_id'];
-    $lot = $lot_finish['lot_id'];
-
-
-    if($lot_finish['winner_id'] == NULL) {
-
-      $sql_winner = "UPDATE lot SET winner_id = $user WHERE id = $lot";
-
-      $result_winner = mysqli_query($connect, $sql_winner);
-
-      if(!$result_winner) {
-        $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
-      }
-    }
-  }  
-
   $page_content = include_template('myrates.php', ['categories' => $categories, 'is_auth' => $is_auth, 'rates' => $rates, 'user_id' => $user_id]);
 
   $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);

@@ -49,7 +49,7 @@
                   <form class="lot-item__form" action="lot.php?id=<?= $id; ?>" method="post" autocomplete="off">
                   <p class="lot-item__form-item form__item <?= $errors['cost'] ? $errors['cost'] : ''; ?>">
                     <label for="cost">Ваша ставка</label>
-                    <input id="cost" type="text" name="cost" placeholder="12 000" value="<?= htmlspecialchars($cost); ?>">
+                    <input id="cost" type="text" name="cost" placeholder="<?= htmlspecialchars(get_sum($lot[0]['current_price'] + $lot[0]['rate_step'])); ?>" value="<?= htmlspecialchars($cost); ?>">
                     <span class="form__error">Введите ставку лота</span>
                   </p>
                   <button type="submit" class="button">Сделать ставку</button>

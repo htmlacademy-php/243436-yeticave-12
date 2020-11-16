@@ -20,7 +20,7 @@
           </div>
           <div class="lot-item__right">
             <?php [$hours, $minutes] = get_dt_range($lot[0]['date_finish']); 
-            if ($is_auth && ($hours > 0 || $minutes > 0) && empty($errors_user) && $rate_user_id != $_SESSION['id'])  : ?>
+            if ($is_auth && ($hours > 0 || $minutes > 0) && empty($errors_user) && $rate_user_id == $_SESSION['id'])  : ?>
               <div class="lot-item__state">
                 <div class="lot-item__timer timer <? if ($hours == 0) : ?> timer--finishing <? endif;?>">
                   <?

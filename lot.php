@@ -28,7 +28,7 @@
   $categories = get_categories($connect);
 
   
-  if (!isset($_GET['id']) || '' == $id = (int)$_GET['id'] ) {
+  if (!isset($_GET['id']) || '' === $id = (int)$_GET['id'] ) {
     header("Location: 404.php");
   };
 
@@ -65,7 +65,7 @@
 
     $cost = $_POST['cost'];
 
-    if(validateFilled('cost') || validate_price('cost') == 'form__item--invalid' || $cost < $min_rate) {
+    if(validateFilled('cost') || validate_price('cost') === 'form__item--invalid' || $cost < $min_rate) {
       $errors['cost'] = 'form__item--invalid';
     }
 
@@ -120,7 +120,7 @@
     $lots_user = mysqli_fetch_all($result_lots_user, MYSQLI_ASSOC);
 
     foreach($lots_user as $lot_user) {
-      if($id == $lot_user['lot_id']) {
+      if($id === $lot_user['lot_id']) {
         $errors_user[$lot_user['lot_id']] = 'Лот создан текущим пользователем';
       }
     }

@@ -90,7 +90,7 @@
       $errors['lot-img'] = 'form--invalid';
     };
 
-    if($_POST['category'] == 'Выберите категорию') {
+    if($_POST['category'] === 'Выберите категорию') {
       $errors['category'] = 'form--invalid';
     };
 

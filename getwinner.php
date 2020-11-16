@@ -30,23 +30,22 @@
 
   $winners = mysqli_fetch_all($result_rate_winner, MYSQLI_ASSOC);
 
-  $recipients = [];
-
   foreach($winners as $winner) {
-    $recipients[$winner['user_email']] = $winner['user_name'];
-  }
+    $message = (new Swift_Message('Ваша ставка победила'));
+    $message->setFrom(['keks@phpdemo.ru' => 'keks@phpdemo.ru']);
+    $message->setTo([$winner['user_email'] => $winner['user_name']]);
 
-  $message = (new Swift_Message('Ваша ставка победила'));
-  $message->setFrom(['keks@phpdemo.ru' => 'keks@phpdemo.ru']);
-  $message->setTo($recipients);
+    $user_name = $winner['user_name'];
+    $lot_name = $winner['lot_name'];
+    $lot_id = $winner['lot_id'];
 
-  $message_content = include_template('email.php', ['winners' => $winners]);
-  $message->setBody($message_content, 'text/html');
+    $message_content = include_template('email.php', ['user_name' => $user_name, 'lot_name' => $lot_name, 'lot_id' => $lot_id]);
+    $message->setBody($message_content, 'text/html');
 
-  $mailer = new Swift_Mailer($transport);
+    $mailer = new Swift_Mailer($transport);
 
-  foreach($winners as $winner) {
-    if($winner['winner_id'] == NULL) {
+    
+    if($winner['winner_id'] === NULL) {
 
       $mailer->send($message);
 
@@ -63,4 +62,5 @@
       }
     }
   }
+  
 ?>

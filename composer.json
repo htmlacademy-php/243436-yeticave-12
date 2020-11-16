@@ -1,0 +1,14 @@
+{
+    "name": "pc/243436-yeticave-12",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pavel trofimov",
+            "email": "pavel.trofimov.tot@mail.ru"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.0"
+    }
+}

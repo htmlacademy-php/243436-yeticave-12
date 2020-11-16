@@ -1,11 +1,11 @@
 <main>
   <nav class="nav">
     <ul class="nav__list container">
-      <?php foreach ($categories as $category): ?>
-        <li class="nav__item">
-          <a href="all-lots.html"><?= htmlspecialchars($category['name']); ?></a>
-        </li>
-      <?php endforeach; ?>  
+        <?php foreach ($categories as $category): ?>
+          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
+            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
+          </li>
+        <?php endforeach; ?> 
     </ul>
   </nav>
   <form class="form form--add-lot container <?= !empty($errors) ? 'form--invalid' : '' ?>" action="add.php" method="post" enctype="multipart/form-data">
@@ -43,12 +43,12 @@
       <span class="form__error">Загрузите допустимый формат файла: jpg, jpeg, png</span>
     </div>
     <div class="form__container-three">
-      <div class="form__item form__item--small  <?= $errors['lot-rate'] || validate_price('lot-rate') == 'form__item--invalid' ? 'form__item--invalid' : ''; ?>">
+      <div class="form__item form__item--small  <?= $errors['lot-rate'] || validate_price('lot-rate') === 'form__item--invalid' ? 'form__item--invalid' : ''; ?>">
         <label for="lot-rate">Начальная цена <sup>*</sup></label>
         <input id="lot-rate" type="text" name="lot-rate" placeholder="0" value="<?= htmlspecialchars($lot_rate); ?>">
         <span class="form__error">Введите начальную цену</span>
       </div>
-      <div class="form__item form__item--small <?= $errors['step-rate'] || validate_price('lot-step') == 'form__item--invalid' ? 'form__item--invalid' : ''; ?>">
+      <div class="form__item form__item--small <?= $errors['step-rate'] || validate_price('lot-step') === 'form__item--invalid' ? 'form__item--invalid' : ''; ?>">
         <label for="lot-step">Шаг ставки <sup>*</sup></label>
         <input id="lot-step" type="text" name="lot-step" placeholder="0" value="<?= htmlspecialchars($lot_step); ?>">
         <span class="form__error">Введите шаг ставки</span>

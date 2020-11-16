@@ -3,27 +3,15 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = false;
-
-  $user_name = '';
-
-  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
-      $user_name = $_SESSION['name'];
-      $is_auth = $_SESSION['auth'];
-  }
-
-  if (!isset($_SESSION['auth'])) {
-    http_response_code(403);
-    die();
-  };
-
-  $title = 'Добавление лота';
 
   $connect = db_connect();
 
-  
 
-  $categories = get_categories($connect);
+  $title = 'Добавление лота';
+
+
+  $user_name = '';
+
 
   $lot_name = '';
   $select_category = '';
@@ -34,6 +22,23 @@
   $file_url = '';
 
   $errors = [];
+
+
+  $is_auth = false;
+
+  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+      $user_name = $_SESSION['name'];
+      $is_auth = $_SESSION['auth'];
+  }
+
+
+  $categories = get_categories($connect);
+
+
+  if (!isset($_SESSION['auth'])) {
+    http_response_code(403);
+    die();
+  };
   
 
   if (
@@ -85,7 +90,7 @@
       $errors['lot-img'] = 'form--invalid';
     };
 
-    if($_POST['category'] == 'Выберите категорию') {
+    if($_POST['category'] === 'Выберите категорию') {
       $errors['category'] = 'form--invalid';
     };
 

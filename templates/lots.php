@@ -2,10 +2,10 @@
     <nav class="nav">
       <ul class="nav__list container">
         <?php foreach ($categories as $category): ?>
-          <li class="nav__item">
-            <a href="all-lots.html"><?= htmlspecialchars($category['name']); ?></a>
+          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
+            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
           </li>
-        <?php endforeach; ?>    
+        <?php endforeach; ?> 
       </ul>
     </nav>
     <section class="lot-item container">      
@@ -49,7 +49,7 @@
                   <form class="lot-item__form" action="lot.php?id=<?= $id; ?>" method="post" autocomplete="off">
                   <p class="lot-item__form-item form__item <?= $errors['cost'] ? $errors['cost'] : ''; ?>">
                     <label for="cost">Ваша ставка</label>
-                    <input id="cost" type="text" name="cost" placeholder="12 000" value="<?= htmlspecialchars($cost); ?>">
+                    <input id="cost" type="text" name="cost" placeholder="<?= htmlspecialchars(get_sum($lot[0]['current_price'] + $lot[0]['rate_step'])); ?>" value="<?= htmlspecialchars($cost); ?>">
                     <span class="form__error">Введите ставку лота</span>
                   </p>
                   <button type="submit" class="button">Сделать ставку</button>

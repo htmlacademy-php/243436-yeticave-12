@@ -1,11 +1,11 @@
 <main>
     <nav class="nav">
       <ul class="nav__list container">
-        <?php foreach ($categories as $category): ?>
-          <li class="nav__item">
-            <a href="all-lots.html"><?= htmlspecialchars($category['name']); ?></a>
+      <?php foreach ($categories as $category): ?>
+          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
+            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
           </li>
-        <?php endforeach; ?>    
+        <?php endforeach; ?>  
       </ul>
     </nav>
     <form class="form container <?= !empty($errors) ? 'form--invalid' : '' ?>" action="registration.php" method="post" autocomplete="off">
@@ -32,6 +32,6 @@
       </div>
       <span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>
       <button type="submit" class="button">Зарегистрироваться</button>
-      <a class="text-link" href="#">Уже есть аккаунт</a>
+      <a class="text-link" href="user-login.php">Уже есть аккаунт</a>
     </form>
   </main>

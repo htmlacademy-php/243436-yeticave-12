@@ -3,21 +3,33 @@
   require_once('helpers.php');
   require_once('functions.php');
 
-  $is_auth = false;
-
-  $user_name = '';
-
-  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
-      $user_name = $_SESSION['name'];
-      $is_auth = $_SESSION['auth'];
-  } 
-
   $connect = db_connect();
 
 
+  $user_name = '';
 
-  if (!isset($_GET['id']) || '' == $id = (int)$_GET['id'] ) {
-    header("Location: pages/404.html");
+  $min_rate = '';  
+
+  $cost = '';
+
+  $errors = ['cost' => ''];
+  
+  $errors_user = [];
+
+
+  $is_auth = false;
+
+  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+    $user_name = $_SESSION['name'];
+    $is_auth = $_SESSION['auth'];
+  } 
+
+
+  $categories = get_categories($connect);
+
+  
+  if (!isset($_GET['id']) || '' === $id = (int)$_GET['id'] ) {
+    header("Location: 404.php");
   };
 
 
@@ -31,26 +43,19 @@
   $result_lots = mysqli_query($connect, $sql_lots);
 
   if(!$result_lots) {
-      $error = mysqli_error($connect);
-      echo 'Ошибка MySQL: '.$error;
+    $error = mysqli_error($connect);
+    echo 'Ошибка MySQL: '.$error;
   }
 
   if(!mysqli_num_rows($result_lots)) {
-    header("Location: pages/404.html");
+    header("Location: 404.php");
   };
 
   $lot = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
   
 
   $title = htmlspecialchars($lot[0]['title']); 
-  
-  $categories = get_categories($connect);
-
-  $min_rate = '';  
-
-  $cost = '';
-
-  $errors = ['cost' => '']; 
+   
 
   if (
     isset($_POST['cost'])
@@ -60,7 +65,7 @@
 
     $cost = $_POST['cost'];
 
-    if(validateFilled('cost') || validate_price('cost') == 'form__item--invalid' || $cost < $min_rate) {
+    if(validateFilled('cost') || validate_price('cost') === 'form__item--invalid' || $cost < $min_rate) {
       $errors['cost'] = 'form__item--invalid';
     }
 
@@ -72,7 +77,6 @@
     $data = [$date_start, $cost, $user_id, $id];
 
     if (empty($errors)) {  
-
       insert_rate($connect, $data);
 
       header("Location: lot.php?id=$id");
@@ -100,8 +104,6 @@
   $rates = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
 
 
-  $errors_user = [];
-
   if(isset($_SESSION['id'])) {
     $sql_lots_user = "SELECT lot.id AS lot_id
     FROM lot
@@ -118,7 +120,7 @@
     $lots_user = mysqli_fetch_all($result_lots_user, MYSQLI_ASSOC);
 
     foreach($lots_user as $lot_user) {
-      if($id == $lot_user['lot_id']) {
+      if($id === $lot_user['lot_id']) {
         $errors_user[$lot_user['lot_id']] = 'Лот создан текущим пользователем';
       }
     }

@@ -5,7 +5,7 @@
         <ul class="promo__list">
             <?php foreach ($categories as $category): ?>
                 <li class="promo__item promo__item--<?= $category['code']; ?>">
-                    <a class="promo__link" href="pages/all-lots.html"><?= htmlspecialchars($category['name']); ?></a>
+                    <a class="promo__link" href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -30,7 +30,7 @@
                             </div>
                             <div class="lot__timer timer <? [$hours, $minutes] = get_dt_range($value['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
                                 <? 
-                                    echo "{$hours}:{$minutes}";
+                                  echo "{$hours}:{$minutes}";
                                 ?>
                             </div>
                         </div>
@@ -39,4 +39,15 @@
             <?php endforeach; ?>    
         </ul>
     </section>
+    <?php if($pages_count > 1) : ?>
+      <ul class="pagination-list">
+        <li class="pagination-item pagination-item-prev"><a href="/index.php?page=<?php if($cur_page > 1) {echo $back_page = $cur_page - 1;} else {echo $back_page = 1;} ?>">Назад</a></li>
+        <?php foreach ($pages as $page): ?>
+          <li class="pagination-item <?php if ($page == $cur_page): ?>pagination-item-active<?php endif; ?>">
+            <a href="/index.php?page=<?=$page;?>"><?=$page;?></a>
+          </li>
+        <?php endforeach; ?>
+        <li class="pagination-item pagination-item-next"><a href="/index.php?page=<?php if($cur_page < $pages_count) {echo $cur_page += 1;} else {echo $cur_page = $pages_count;} ?>">Вперед</a></li>
+      </ul>
+    <?php endif; ?>
 </main>

@@ -3,6 +3,21 @@
   require_once('helpers.php');
   require_once('functions.php');
 
+
+  $connect = db_connect();
+
+
+  $title = 'Регистрация';
+
+
+  $email = '';
+  $password = '';
+  $first_name = '';
+  $message = '';
+
+  $errors = [];
+
+
   $is_auth = false;
 
   if (isset($_SESSION['auth'])) {
@@ -10,21 +25,10 @@
     die();
   };
 
-  $title = 'Регистрация';
-
-  $connect = db_connect();
-
+  
   $categories = get_categories($connect);
 
-  $email = '';
-  $password = '';
-  $first_name = '';
-  $message = '';
-
-
-  $errors = [];
   
-
   if (
     isset($_POST['email']) && 
     isset($_POST['password']) && 

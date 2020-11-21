@@ -2,8 +2,8 @@
     <nav class="nav">
       <ul class="nav__list container">
         <?php foreach ($categories as $category): ?>
-          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
-            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
+          <li class="nav__item">
+            <a href="all-lots.php?category_id=<?= (int) $category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
           </li>
         <?php endforeach; ?>
       </ul>
@@ -11,7 +11,7 @@
     <div class="container">
       <section class="lots">
         <h2>Результаты поиска по запросу «<span><?= htmlspecialchars($search); ?></span>»</h2>
-        <?php if(!empty($lots)) : ?>
+        <?php if (!empty($lots)) : ?>
         <ul class="lots__list">
             <?php foreach ($lots as $key => $value): ?>
               <li class="lots__item lot">
@@ -26,8 +26,8 @@
                       <span class="lot__amount">Стартовая цена</span>
                       <span class="lot__cost"><?= htmlspecialchars(get_sum($value['current_price'])); ?></span>
                     </div>
-                    <div class="lot__timer timer <? [$hours, $minutes] = get_dt_range($value['date_finish']); if ($hours == 0) : ?> timer--finishing <? endif;?>">
-                      <? 
+                    <div class="lot__timer timer <?php [$hours, $minutes] = get_dt_range($value['date_finish']); if ((int) $hours === 0) : ?> timer--finishing <?php endif; ?>">
+                      <?php
                         echo "{$hours}:{$minutes}";
                       ?>
                     </div>
@@ -40,15 +40,23 @@
           <p>Ничего не найдено по вашему запросу</p>  
         <?php endif; ?>
       </section>
-      <?php if($pages_count > 1) : ?>
+      <?php if ((int) $pages_count > 1) : ?>
         <ul class="pagination-list">
-          <li class="pagination-item pagination-item-prev"><a href="/search.php?search=<?=$search;?>&find=Найти&page=<?php if($cur_page > 1) {echo $back_page = $cur_page - 1;} else {echo $back_page = 1;} ?>">Назад</a></li>
+          <li class="pagination-item pagination-item-prev"><a href="/search.php?search=<?=$search; ?>&find=Найти&page=<?php if ((int) $cur_page > 1) {
+                          echo $back_page = (int) $cur_page - 1;
+                      } else {
+                          echo $back_page = 1;
+                      } ?>">Назад</a></li>
           <?php foreach ($pages as $page): ?>
-            <li class="pagination-item <?php if ($page == $cur_page): ?>pagination-item-active<?php endif; ?>">
-              <a href="/search.php?search=<?=$search;?>&find=Найти&page=<?=$page;?>"><?=$page;?></a>
+            <li class="pagination-item <?php if ((int) $page === (int) $cur_page): ?>pagination-item-active<?php endif; ?>">
+              <a href="/search.php?search=<?=$search; ?>&find=Найти&page=<?=(int) $page; ?>"><?=(int) $page; ?></a>
             </li>
           <?php endforeach; ?>
-          <li class="pagination-item pagination-item-next"><a href="/search.php?search=<?=$search;?>&find=Найти&page=<?php if($cur_page < $pages_count) {echo $cur_page += 1;} else {echo $cur_page = $pages_count;} ?>">Вперед</a></li>
+          <li class="pagination-item pagination-item-next"><a href="/search.php?search=<?=$search; ?>&find=Найти&page=<?php if ((int) $cur_page < (int) $pages_count) {
+                          echo (int) ++$cur_page;
+                      } else {
+                          echo (int) $cur_page = (int) $pages_count;
+                      } ?>">Вперед</a></li>
         </ul>
       <?php endif; ?>
     </div>

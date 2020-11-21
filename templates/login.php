@@ -2,13 +2,13 @@
     <nav class="nav">
       <ul class="nav__list container">
         <?php foreach ($categories as $category): ?>
-          <li class="nav__item <?php if($category['id'] == $_GET['category_id']) {echo 'nav__item--current';} ?>">
-            <a href="all-lots.php?category_id=<?= $category['id'] ?>"><?= htmlspecialchars($category['name']); ?></a>
+          <li class="nav__item">
+            <a href="all-lots.php?category_id=<?= (int) $category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
           </li>
         <?php endforeach; ?>
       </ul>
     </nav>
-    <form class="form container <?= !empty($errors) ? 'form--invalid' : '' ?>" action="user-login.php" method="post">
+    <form class="form container <?= !empty($errors) ? 'form--invalid' : ''; ?>" action="user-login.php" method="post">
       <h2>Вход</h2>
       <div class="form__item <?= isset($errors['email']) ? 'form__item--invalid' : ''; ?>"> 
         <label for="email">E-mail <sup>*</sup></label>

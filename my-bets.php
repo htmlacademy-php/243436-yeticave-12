@@ -1,51 +1,33 @@
 <?php
-  session_start();
-  require_once('helpers.php');
-  require_once('functions.php');
 
+  session_start();
+  require_once 'helpers.php';
+  require_once 'functions.php';
 
   $connect = db_connect();
 
-
   $title = 'Мои ставки';
-
 
   $user_name = '';
 
-
   $is_auth = false;
 
-  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
-      $user_name = $_SESSION['name'];
+  if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+      $user_name = htmlspecialchars($_SESSION['name']);
       $is_auth = $_SESSION['auth'];
-      $user_id = $_SESSION['id'];
-  } 
-
+      $user_id = (int) $_SESSION['id'];
+  } else {
+      http_response_code(403);
+      header('Location: user-login.php');
+      die();
+  }
 
   $categories = get_categories($connect);
 
-
-  $sql_rate = "SELECT rate.user_id AS user_id, rate.lot_id AS lot_id, rate.cost AS rate_cost, rate.date AS rate_date, lot.path AS img_path, lot.title AS lot_name, lot.date_finish AS lot_date_finish, category.name AS category_name, lot.winner_id AS winner_id, user.contact AS contact
-    FROM rate
-      JOIN lot ON lot.id = rate.lot_id
-      JOIN user ON user.id = rate.user_id
-      JOIN category ON category.id = lot.category_id
-      WHERE rate.user_id = $user_id 
-      ORDER BY rate.date DESC";
-
-  $result_rate = mysqli_query($connect, $sql_rate);
-
-  if(!$result_rate) {
-    $error = mysqli_error($connect);
-    echo 'Ошибка MySQL: '.$error;
-  }
-
-  $rates = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
+  $rates = get_rates_lots_user($connect, $user_id);
 
   $page_content = include_template('myrates.php', ['categories' => $categories, 'is_auth' => $is_auth, 'rates' => $rates, 'user_id' => $user_id]);
 
   $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
 
   echo $layout_content;
-  
-?>

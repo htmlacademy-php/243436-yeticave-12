@@ -1,14 +1,12 @@
 <?php
-  session_start();
-  require_once('helpers.php');
-  require_once('functions.php');
 
+  session_start();
+  require_once 'helpers.php';
+  require_once 'functions.php';
 
   $connect = db_connect();
 
-
   $title = 'Поиск';
-
 
   $user_name = '';
 
@@ -16,77 +14,84 @@
   $search = '';
   $back_page = '';
 
-
   $is_auth = false;
 
-  if(isset($_SESSION['name']) && isset($_SESSION['auth'])) {
-    $user_name = $_SESSION['name'];
-    $is_auth = $_SESSION['auth'];
+  if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+      $user_name = htmlspecialchars($_SESSION['name']);
+      $is_auth = $_SESSION['auth'];
   }
-
 
   $categories = get_categories($connect);
 
+  if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === '')) {
+      header('Location: 404.php');
+  } else {
+      $search = trim($_GET['search']);
 
-  if (
-    isset($_GET['search'])
-  ) {
-    $search = trim($_GET['search']);
+      $sql_lots = 'SELECT COUNT(*) as count FROM lot WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)';
 
-    $sql_lots = "SELECT COUNT(*) as count FROM lot WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)";
+      $stmt = mysqli_prepare($connect, $sql_lots);
 
-    $stmt = mysqli_prepare($connect, $sql_lots);
+      mysqli_stmt_bind_param($stmt, 's', $_GET['search']);
 
-    mysqli_stmt_bind_param($stmt, 's', $_GET['search']);
+      mysqli_stmt_execute($stmt);
 
-    mysqli_stmt_execute($stmt);
+      $res = mysqli_stmt_get_result($stmt);
 
-    $res = mysqli_stmt_get_result($stmt);
+      if (!$res) {
+          $error = mysqli_error($connect);
+          echo 'Ошибка MySQL: '.$error;
+          die();
+      }
 
-    if(!$res) {
-      $error = mysqli_error($connect);
-      echo 'Ошибка MySQL: '.$error;
-      die();
-    }
+      $lots = mysqli_fetch_assoc($res)['count'];
 
-    $lots = mysqli_fetch_assoc($res)['count'];
+      if (isset($_GET['page']) && $_GET['page'] === '') {
+          header('Location: 404.php');
+      } elseif (!isset($_GET['page'])) {
+          $cur_page = 1;
+      } else {
+          $cur_page = (int) $_GET['page'];
+      }
 
-    $cur_page = $_GET['page'] ?? 1;
-    $page_items = 9;
+      $page_items = 9;
 
-    $pages_count = ceil($lots/$page_items);
-    $offset = ($cur_page - 1) * $page_items;
+      $pages_count = ceil($lots / $page_items);
+      $offset = ($cur_page - 1) * $page_items;
 
-    $pages = range(1, $pages_count);
+      if (isset($_GET['page']) && ((int) $_GET['page'] > (int) $pages_count || (int) $_GET['page'] <= 0)) {
+          header('Location: 404.php');
+      }
 
-    $sql_lots = "SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+      $pages = range(1, $pages_count);
+
+      $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot 
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id
             WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)
             GROUP BY lot.id
-            ORDER BY lot.date_start DESC LIMIT ".$page_items." OFFSET ".$offset;
-    
-    $stmt = mysqli_prepare($connect, $sql_lots);
+            ORDER BY lot.date_start DESC LIMIT '.$page_items.' OFFSET '.$offset;
 
-    mysqli_stmt_bind_param($stmt, 's', $_GET['search']);
+      $stmt = mysqli_prepare($connect, $sql_lots);
 
-    mysqli_stmt_execute($stmt);
+      mysqli_stmt_bind_param($stmt, 's', $_GET['search']);
 
-    $res = mysqli_stmt_get_result($stmt);
+      mysqli_stmt_execute($stmt);
 
-    if(!$res) {
-        $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
-        die();
-    }
+      $res = mysqli_stmt_get_result($stmt);
 
-    $lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
+      if (!$res) {
+          $error = mysqli_error($connect);
+          echo 'Ошибка MySQL: '.$error;
+          die();
+      }
+
+      $lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
   }
 
   $page_content = include_template('search-result.php', ['categories' => $categories, 'lots' => $lots, 'search' => $search, 'pages_count' => $pages_count, 'pages' => $pages, 'cur_page' => $cur_page, 'back_page' => $back_page]);
-  
+
   $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth, 'search' => $search]);
 
   echo $layout_content;
-?>

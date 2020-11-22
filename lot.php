@@ -1,85 +1,103 @@
 <?php
 
-  session_start();
-  require_once 'helpers.php';
-  require_once 'functions.php';
+session_start();
+require_once 'helpers.php';
+require_once 'functions.php';
 
-  $connect = db_connect();
+$connect = db_connect();
 
-  $user_name = '';
+$user_name = '';
 
-  $min_rate = '';
+$min_rate = '';
 
-  $cost = '';
+$cost = '';
 
-  $errors = [];
+$errors = [];
 
-  $errors_user = [];
+$errors_user = [];
 
-  $is_auth = false;
+$is_auth = false;
 
-  if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
-      $user_name = htmlspecialchars($_SESSION['name']);
-      $is_auth = $_SESSION['auth'];
-      $user_session_id = $_SESSION['id'];
-  }
+if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+    $user_name = htmlspecialchars($_SESSION['name']);
+    $is_auth = $_SESSION['auth'];
+    $user_session_id = $_SESSION['id'];
+}
 
-  $categories = get_categories($connect);
+$categories = get_categories($connect);
 
-  if (!isset($_GET['id']) || isset($_GET['id']) && $_GET['id'] === '' || get_lot($connect, $_GET['id']) === null) {
-      header('Location: 404.php');
-      die();
-  }
+if (!isset($_GET['id']) || isset($_GET['id']) && $_GET['id'] === '' || get_lot($connect, $_GET['id']) === null) {
+    header('Location: 404.php');
+    die();
+}
 
-  $lot_id = (int) $_GET['id'];
+$lot_id = (int)$_GET['id'];
 
-  $lot = get_lot($connect, $lot_id);
+$lot = get_lot($connect, $lot_id);
 
-  $title = htmlspecialchars($lot['title']);
+$title = htmlspecialchars($lot['title']);
 
-  if (
-    isset($_POST['cost'])
-  ) {
-      $min_rate = htmlspecialchars($lot['current_price'] + $lot['rate_step']);
+if (
+isset($_POST['cost'])
+) {
+    $min_rate = htmlspecialchars($lot['current_price'] + $lot['rate_step']);
 
-      $cost = (int) $_POST['cost'];
+    $cost = (int)$_POST['cost'];
 
-      if (show_errors('cost', 10, 'Введите ставку лота', 'Слишком большое число')) {
-          $errors['cost'] = show_errors('cost', 10, 'Введите ставку лота', 'Слишком большое число');
-      } elseif (validate_price('cost') === 'form__item--invalid' || $cost < $min_rate) {
-          $errors['cost'] = 'Введите корректное значение';
-      }
+    if (show_errors('cost', 10, 'Введите ставку лота', 'Слишком большое число')) {
+        $errors['cost'] = show_errors('cost', 10, 'Введите ставку лота', 'Слишком большое число');
+    } elseif (validate_price('cost') === 'form__item--invalid' || $cost < $min_rate) {
+        $errors['cost'] = 'Введите корректное значение';
+    }
 
-      $errors = array_filter($errors);
+    $errors = array_filter($errors);
 
-      $date_start = date('Y-m-d H:i:s', time());
-      $user_id = $user_session_id;
+    $date_start = date('Y-m-d H:i:s', time());
+    $user_id = $user_session_id;
 
-      $data = [$date_start, $cost, $user_id, $lot_id];
+    $data = [$date_start, $cost, $user_id, $lot_id];
 
-      if (empty($errors)) {
-          insert_rate($connect, $data);
+    if (empty($errors)) {
+        insert_rate($connect, $data);
 
-          header("Location: lot.php?id=$lot_id");
-      }
-  }
+        header("Location: lot.php?id=$lot_id");
+    }
+}
 
-  $rates = get_lot_rates($connect, $lot_id);
+$rates = get_lot_rates($connect, $lot_id);
 
-  $rate_count = $rates === null ? 0 : count($rates);
+$rate_count = $rates === null ? 0 : count($rates);
 
-  if (isset($user_session_id)) {
-      $user_id_create_lot = get_user_id_create_lot($connect, $lot_id);
+if (isset($user_session_id)) {
+    $user_id_create_lot = get_user_id_create_lot($connect, $lot_id);
 
-      if ($user_session_id === $user_id_create_lot['user_id']) {
-          $errors_user[$user_id_create_lot['user_id']] = 'Лот создан текущим пользователем';
-      }
-  }
+    if ($user_session_id === $user_id_create_lot['user_id']) {
+        $errors_user[$user_id_create_lot['user_id']] = 'Лот создан текущим пользователем';
+    }
+}
 
-  $user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id'];
+$user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id'];
 
-  $page_content = include_template('lots.php', ['categories' => $categories, 'lot' => $lot, 'is_auth' => $is_auth, 'cost' => $cost, 'min_rate' => $min_rate, 'errors' => $errors, 'lot_id' => $lot_id, 'rates' => $rates, 'rate_count' => $rate_count, 'errors_user' => $errors_user, 'user_id_last_rate' => $user_id_last_rate]);
+$page_content = include_template('lots.php', [
+    'categories' => $categories,
+    'lot' => $lot,
+    'is_auth' => $is_auth,
+    'cost' => $cost,
+    'min_rate' => $min_rate,
+    'errors' => $errors,
+    'lot_id' => $lot_id,
+    'rates' => $rates,
+    'rate_count' => $rate_count,
+    'errors_user' => $errors_user,
+    'user_id_last_rate' => $user_id_last_rate
+]);
 
-  $layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
+$layout_content = include_template('layout.php', [
+    'content' => $page_content,
+    'categories' => $categories,
+    'title' => $title,
+    'user_name' => $user_name,
+    'is_auth' => $is_auth
+]);
 
-  echo $layout_content;
+echo $layout_content;

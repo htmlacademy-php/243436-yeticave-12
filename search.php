@@ -43,7 +43,7 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
 
     if (!$res) {
         $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -54,7 +54,7 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
     } elseif (!isset($_GET['page'])) {
         $cur_page = 1;
     } else {
-        $cur_page = (int) $_GET['page'];
+        $cur_page = (int)$_GET['page'];
     }
 
     $page_items = 9;
@@ -62,8 +62,9 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
     $pages_count = ceil($lots / $page_items);
     $offset = ($cur_page - 1) * $page_items;
 
-    if (isset($_GET['page']) && ((int) $_GET['page'] > (int) $pages_count || (int) $_GET['page'] <= 0)) {
+    if (isset($_GET['page']) && ((int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
         header('Location: 404.php');
+        die();
     }
 
     $pages = range(1, $pages_count);
@@ -74,7 +75,7 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
         LEFT JOIN rate ON rate.lot_id = lot.id
             WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)
             GROUP BY lot.id
-            ORDER BY lot.date_start DESC LIMIT '.$page_items.' OFFSET '.$offset;
+            ORDER BY lot.date_start DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
 
     $stmt = mysqli_prepare($connect, $sql_lots);
 
@@ -86,7 +87,7 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
 
     if (!$res) {
         $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 

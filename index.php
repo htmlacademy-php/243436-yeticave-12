@@ -48,6 +48,7 @@ $offset = ($cur_page - 1) * $page_items;
 
 if (isset($_GET['page']) && ((int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
     header('Location: 404.php');
+    die();
 }
 
 $pages = range(1, $pages_count);

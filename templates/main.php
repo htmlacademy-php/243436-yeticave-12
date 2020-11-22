@@ -1,11 +1,13 @@
 <main class="container">
     <section class="promo">
         <h2 class="promo__title">Нужен стафф для катки?</h2>
-        <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное снаряжение.</p>
+        <p class="promo__text">На нашем интернет-аукционе ты найдёшь самое эксклюзивное сноубордическое и горнолыжное
+            снаряжение.</p>
         <ul class="promo__list">
             <?php foreach ($categories as $category) : ?>
                 <li class="promo__item promo__item--<?= $category['code']; ?>">
-                    <a class="promo__link" href="all-lots.php?category_id=<?= $category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
+                    <a class="promo__link"
+                       href="all-lots.php?category_id=<?= $category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
                 </li>
             <?php endforeach; ?>
         </ul>
@@ -22,14 +24,17 @@
                     </div>
                     <div class="lot__info">
                         <span class="lot__category"><?= htmlspecialchars($value['category']); ?></span>
-                        <h3 class="lot__title"><a class="text-link" href="lot.php?id=<?= $value['id']; ?>"><?= htmlspecialchars($value['title']); ?></a></h3>
+                        <h3 class="lot__title"><a class="text-link"
+                                                  href="lot.php?id=<?= $value['id']; ?>"><?= htmlspecialchars($value['title']); ?></a>
+                        </h3>
                         <div class="lot__state">
                             <div class="lot__rate">
                                 <span class="lot__amount">Стартовая цена</span>
-                                <span class="lot__cost"><?= htmlspecialchars(get_sum($value['current_price'])); ?></span>
+                                <span
+                                    class="lot__cost"><?= htmlspecialchars(get_sum($value['current_price'])); ?></span>
                             </div>
                             <div class="lot__timer timer <?php [$hours, $minutes] = get_dt_range($value['date_finish']);
-                                                            if ((int) $hours === 0) : ?> timer--finishing <?php endif; ?>">
+                            if ((int)$hours === 0) : ?> timer--finishing <?php endif; ?>">
                                 <?php
                                 echo "{$hours}:{$minutes}";
                                 ?>
@@ -43,20 +48,21 @@
     <?php if ($pages_count > 1) : ?>
         <ul class="pagination-list">
             <li class="pagination-item pagination-item-prev"><a href="/index.php?page=<?php if ($cur_page > 1) {
-                                    echo $back_page = $cur_page - 1;
-                                } else {
-                                    echo $back_page = 1;
-                                } ?>">Назад</a></li>
+                    echo $back_page = $cur_page - 1;
+                } else {
+                    echo $back_page = 1;
+                } ?>">Назад</a></li>
             <?php foreach ($pages as $page) : ?>
-                <li class="pagination-item <?php if ((int) $page === $cur_page) : ?>pagination-item-active<?php endif; ?>">
+                <li class="pagination-item <?php if ((int)$page === $cur_page) : ?>pagination-item-active<?php endif; ?>">
                     <a href="/index.php?page=<?= $page; ?>"><?= $page; ?></a>
                 </li>
             <?php endforeach; ?>
-            <li class="pagination-item pagination-item-next"><a href="/index.php?page=<?php if ($cur_page < $pages_count) {
-                                    echo ++$cur_page;
-                                } else {
-                                    echo $cur_page = $pages_count;
-                                } ?>">Вперед</a></li>
+            <li class="pagination-item pagination-item-next"><a
+                    href="/index.php?page=<?php if ($cur_page < $pages_count) {
+                        echo ++$cur_page;
+                    } else {
+                        echo $cur_page = $pages_count;
+                    } ?>">Вперед</a></li>
         </ul>
     <?php endif; ?>
 </main>

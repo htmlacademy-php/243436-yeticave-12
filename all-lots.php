@@ -24,7 +24,7 @@ $categories = get_categories($connect);
 if (!isset($_GET['category_id']) || (isset($_GET['category_id']) && $_GET['category_id'] === '')) {
     header('Location: 404.php');
 } else {
-    $category_id = (int) $_GET['category_id'];
+    $category_id = (int)$_GET['category_id'];
 
     $category_count = get_category_count($connect, $category_id);
 
@@ -35,7 +35,7 @@ if (!isset($_GET['category_id']) || (isset($_GET['category_id']) && $_GET['categ
     } elseif (!isset($_GET['page'])) {
         $cur_page = 1;
     } else {
-        $cur_page = (int) $_GET['page'];
+        $cur_page = (int)$_GET['page'];
     }
 
     $page_items = 9;
@@ -51,13 +51,27 @@ if (!isset($_GET['category_id']) || (isset($_GET['category_id']) && $_GET['categ
 
     $lots = get_lot_category_count($connect, $category_id, $page_items, $offset);
 
-    if (get_list_id_category($connect, (int) $category_id) === null) {
+    if (get_list_id_category($connect, (int)$category_id) === null) {
         header('Location: 404.php');
     }
 }
 
-$page_content = include_template('all-lots-result.php', ['categories' => $categories, 'lots' => $lots, 'pages_count' => $pages_count, 'pages' => $pages, 'cur_page' => $cur_page, 'back_page' => $back_page, 'category_id' => $category_id]);
+$page_content = include_template('all-lots-result.php', [
+    'categories' => $categories,
+    'lots' => $lots,
+    'pages_count' => $pages_count,
+    'pages' => $pages,
+    'cur_page' => $cur_page,
+    'back_page' => $back_page,
+    'category_id' => $category_id
+]);
 
-$layout_content = include_template('layout.php', ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'user_name' => $user_name, 'is_auth' => $is_auth]);
+$layout_content = include_template('layout.php', [
+    'content' => $page_content,
+    'categories' => $categories,
+    'title' => $title,
+    'user_name' => $user_name,
+    'is_auth' => $is_auth
+]);
 
 echo $layout_content;

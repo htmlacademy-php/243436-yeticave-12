@@ -9,7 +9,7 @@ function db_connect()
     mysqli_set_charset($connect, 'utf8');
 
     if (!$connect) {
-        echo 'Ошибка подключения: '.mysqli_connect_error();
+        echo 'Ошибка подключения: ' . mysqli_connect_error();
         die();
     }
 
@@ -56,7 +56,7 @@ function get_sum(float $cost)
         $cost = number_format($cost, 0, ',', ' ');
     }
 
-    return $cost.' ₽';
+    return $cost . ' ₽';
 }
 
 /**
@@ -77,7 +77,7 @@ function get_rate(float $cost)
         $cost = number_format($cost, 0, ',', ' ');
     }
 
-    return $cost.' р';
+    return $cost . ' р';
 }
 
 /**
@@ -116,7 +116,7 @@ function validateEmail(string $name)
  * Валидация на проверку длины строки.
  *
  * @param string $name проверяемое значение
- * @param int    $max  максимальное значение длины поля
+ * @param int $max максимальное значение длины поля
  *
  * @return string|null возвращает ошибку, если длина строки не корректная
  */
@@ -143,7 +143,8 @@ function validate_price($price)
     $invalid_price = '';
 
     if (isset($_POST[$price])) {
-        $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
+        $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
     }
 
     return $invalid_price;
@@ -152,8 +153,8 @@ function validate_price($price)
 /**
  * Показ ошибок при валидации.
  *
- * @param string $name     проверяемое значение
- * @param int    $max      максимальное значение длины поля
+ * @param string $name проверяемое значение
+ * @param int $max максимальное значение длины поля
  * @param string $show_one описание первой ошибки
  * @param string $show_two описание второй ошибки
  *
@@ -183,7 +184,7 @@ function get_categories($connect)
 
     if (!$result_categories) {
         $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
     }
 
     $categories = mysqli_fetch_all($result_categories, MYSQLI_ASSOC);
@@ -206,7 +207,7 @@ function get_rates_lots_user($link, string $user_id)
       JOIN lot ON lot.id = rate.lot_id
       JOIN user ON user.id = rate.user_id
       JOIN category ON category.id = lot.category_id
-      WHERE rate.user_id = ? 
+      WHERE rate.user_id = ?
       ORDER BY rate.date DESC';
 
     $stmt = mysqli_prepare($link, $sql_rate);
@@ -219,7 +220,7 @@ function get_rates_lots_user($link, string $user_id)
 
     if (!$result_rate) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -243,10 +244,10 @@ function get_rates_lots_user($link, string $user_id)
 function get_lot($link, int $lot_id)
 {
     $sql_lot = 'SELECT lot.rate_step, date_finish, description, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
-      FROM lot 
+      FROM lot
           JOIN category ON lot.category_id = category.id
           LEFT JOIN rate ON rate.lot_id = lot.id
-              WHERE lot.id = ? 
+              WHERE lot.id = ?
               GROUP BY lot.id';
 
     $stmt = mysqli_prepare($link, $sql_lot);
@@ -259,7 +260,7 @@ function get_lot($link, int $lot_id)
 
     if (!$result_lot) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -296,7 +297,7 @@ function get_lot_count($link, int $category_id)
 
     if (!$result_categories) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -327,7 +328,7 @@ function get_category_count($link, int $category_id)
 
     if (!$result_lots_count) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -358,7 +359,7 @@ function get_list_id_category($link, int $category_id)
 
     if (!$result_id_category) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -376,15 +377,15 @@ function get_list_id_category($link, int $category_id)
  *
  * @param $link mysqli Ресурс соединения
  * @param int $category_id id категории
- * @param int $page_items  лимит показа лотов на странице
- * @param int $offset      смещение
+ * @param int $page_items лимит показа лотов на странице
+ * @param int $offset смещение
  *
  * @return int количество категорий
  */
 function get_lot_category_count($link, int $category_id, int $page_items, int $offset)
 {
     $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, lot.category_id AS category_id, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price, (SELECT COUNT(*) FROM rate WHERE rate.lot_id = lot.id) AS count_rate
-    FROM lot 
+    FROM lot
       JOIN category ON lot.category_id = category.id
       LEFT JOIN rate ON rate.lot_id = lot.id
         WHERE date_finish > NOW() AND category.id = ?
@@ -401,7 +402,7 @@ function get_lot_category_count($link, int $category_id, int $page_items, int $o
 
     if (!$result_lots) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -421,7 +422,7 @@ function get_lot_category_count($link, int $category_id, int $page_items, int $o
 function get_lot_rates($link, int $lot_id)
 {
     $sql_rate = 'SELECT rate.date AS date, rate.cost, user.name, user.id AS user_id, lot.id
-    FROM rate 
+    FROM rate
         JOIN user ON rate.user_id = user.id
         JOIN lot ON rate.lot_id = lot.id
         WHERE lot.id = ?
@@ -437,7 +438,7 @@ function get_lot_rates($link, int $lot_id)
 
     if (!$result_rate) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -460,7 +461,7 @@ function get_lot_rates($link, int $lot_id)
  */
 function insert_lot($link, array $data = [])
 {
-    $sql_lot = 'INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id) 
+    $sql_lot = 'INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
     $prepare = db_get_prepare_stmt($link, $sql_lot, $data);
@@ -469,7 +470,7 @@ function insert_lot($link, array $data = [])
 
     if (!mysqli_stmt_execute($prepare)) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -502,7 +503,7 @@ function check_email($link, string $data)
 
     if (!$result_email) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -537,7 +538,7 @@ function check_id_category($link, int $data)
 
     if (!$result_id_category) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -570,7 +571,7 @@ function get_data_user($link, string $data)
 
     if (!$result_data_user) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -605,7 +606,7 @@ function get_user_id_create_lot($link, int $data)
 
     if (!$result_user_id) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -630,7 +631,7 @@ function get_user_id_last_rate($link, int $data)
 {
     $sql_rate_user_id = 'SELECT rate.user_id
     FROM rate
-      WHERE rate.lot_id = ? 
+      WHERE rate.lot_id = ?
         ORDER BY cost DESC LIMIT 1';
 
     $stmt = mysqli_prepare($link, $sql_rate_user_id);
@@ -643,7 +644,7 @@ function get_user_id_last_rate($link, int $data)
 
     if (!$result_rate_user_id) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 
@@ -664,14 +665,14 @@ function get_user_id_last_rate($link, int $data)
  */
 function insert_user($link, array $data = [])
 {
-    $sql_user = 'INSERT INTO user(created_at, email, name, password, contact) 
+    $sql_user = 'INSERT INTO user(created_at, email, name, password, contact)
       VALUES(?, ?, ?, ?, ?)';
 
     $prepare = db_get_prepare_stmt($link, $sql_user, $data);
 
     if (!mysqli_stmt_execute($prepare)) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 }
@@ -684,14 +685,14 @@ function insert_user($link, array $data = [])
  */
 function insert_rate($link, array $data = [])
 {
-    $sql_rate = 'INSERT INTO rate(date, cost, user_id, lot_id) 
+    $sql_rate = 'INSERT INTO rate(date, cost, user_id, lot_id)
     VALUES(?, ?, ?, ?)';
 
     $prepare = db_get_prepare_stmt($link, $sql_rate, $data);
 
     if (!mysqli_stmt_execute($prepare)) {
         $error = mysqli_error($link);
-        echo 'Ошибка MySQL: '.$error;
+        echo 'Ошибка MySQL: ' . $error;
         die();
     }
 }
@@ -716,11 +717,12 @@ function get_time_rate(string $rate_time)
     if ($result_time_hour == 0 && $result_time_min == 0 && $result_time_sec < 60) {
         $time_public = 'только что';
     } elseif ($result_time_hour == 0 && $result_time_min < 60 && $result_time_min >= 1) {
-        $time_public = $result_time_min.get_noun_plural_form($result_time_min, ' минуту', ' минуты', ' минут', ' минута').' назад';
+        $time_public = $result_time_min . get_noun_plural_form($result_time_min, ' минуту', ' минуты', ' минут',
+                ' минута') . ' назад';
     } elseif ($result_time_hour >= 1 && $result_all_second < 7200) {
         $time_public = 'Час назад';
     } elseif ($result_all_second >= 7200) {
-        $time_public = date('d.m.y', $past_time).' в '.date('H:i', $past_time);
+        $time_public = date('d.m.y', $past_time) . ' в ' . date('H:i', $past_time);
     }
 
     return $time_public;

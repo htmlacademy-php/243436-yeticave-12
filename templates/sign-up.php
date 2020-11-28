@@ -1,11 +1,17 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
-            <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
-                    <a href="all-lots.php?category_id=<?= (int)$category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
-                </li>
-            <?php endforeach; ?>
+            <?php if($categories === null) : ?>
+            <?= ''; ?>
+            <?php else :?>
+                <?php foreach ($categories as $category): ?>
+                    <li class="nav__item <?php if (isset($_GET['category_id']) && ((int)$category['id'] === (int)$_GET['category_id'])) {
+                        echo 'nav__item--current';
+                    } ?>">
+                        <a href="all-lots.php?category_id=<?= (int)$category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
+                    </li>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </ul>
     </nav>
     <form class="form container <?= !empty($errors) ? 'form--invalid' : ''; ?>" action="registration.php" method="post"

@@ -1,5 +1,4 @@
 <?php
-
 session_start();
 require_once 'helpers.php';
 require_once 'functions.php';
@@ -12,16 +11,21 @@ $min_rate = '';
 
 $cost = '';
 
+$user_id_last_rate = '';
+
 $errors = [];
 
 $errors_user = [];
 
 $is_auth = false;
 
-if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+    session_unset();
+    header('Location: /index.php');
+} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
-    $user_session_id = $_SESSION['id'];
+    $user_session_id = (int) $_SESSION['id'];
 }
 
 $categories = get_categories($connect);
@@ -76,7 +80,10 @@ if (isset($user_session_id)) {
     }
 }
 
-$user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id'];
+
+if(get_user_id_last_rate($connect, $lot_id) !== null) {
+    $user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id']; 
+}
 
 $page_content = include_template('lots.php', [
     'categories' => $categories,

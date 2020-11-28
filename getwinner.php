@@ -3,6 +3,10 @@
 $connect = db_connect();
 require_once 'vendor/autoload.php';
 
+$user_name = '';
+$lot_name = '';
+$lot_id = '';
+
 $transport = (new Swift_SmtpTransport('phpdemo.ru', 25));
 $transport->setUsername('keks@phpdemo.ru');
 $transport->setPassword('htmlacademy');
@@ -28,34 +32,36 @@ if (!$result_rate_winner) {
 
 $winners = mysqli_fetch_all($result_rate_winner, MYSQLI_ASSOC);
 
-foreach ($winners as $winner) {
-    $message = (new Swift_Message('Ваша ставка победила'));
-    $message->setFrom(['keks@phpdemo.ru' => 'keks@phpdemo.ru']);
-    $message->setTo([$winner['user_email'] => $winner['user_name']]);
-
-    $user_name = $winner['user_name'];
-    $lot_name = $winner['lot_name'];
-    $lot_id = (int)$winner['lot_id'];
-
-    $message_content = include_template('email.php',
-        ['user_name' => $user_name, 'lot_name' => $lot_name, 'lot_id' => $lot_id]);
-    $message->setBody($message_content, 'text/html');
-
-    $mailer = new Swift_Mailer($transport);
-
-    if ($winner['winner_id'] === null) {
-        $mailer->send($message);
-
-        $user = (int)$winner['user_id'];
-        $lot = (int)$winner['lot_id'];
-
-        $sql_winner = "UPDATE lot SET winner_id = $user WHERE id = $lot";
-
-        $result_winner = mysqli_query($connect, $sql_winner);
-
-        if (!$result_winner) {
-            $error = mysqli_error($connect);
-            echo 'Ошибка MySQL: ' . $error;
+if(!empty($winners)) {
+    foreach ($winners as $winner) {
+        $message = (new Swift_Message('Ваша ставка победила'));
+        $message->setFrom(['keks@phpdemo.ru' => 'keks@phpdemo.ru']);
+        $message->setTo([$winner['user_email'] => $winner['user_name']]);
+    
+        $user_name = $winner['user_name'];
+        $lot_name = $winner['lot_name'];
+        $lot_id = (int)$winner['lot_id'];
+    
+        $message_content = include_template('email.php',
+            ['user_name' => $user_name, 'lot_name' => $lot_name, 'lot_id' => $lot_id]);
+        $message->setBody($message_content, 'text/html');
+    
+        $mailer = new Swift_Mailer($transport);
+    
+        if ($winner['winner_id'] === null) {
+            $mailer->send($message);
+    
+            $user = (int)$winner['user_id'];
+            $lot = (int)$winner['lot_id'];
+    
+            $sql_winner = "UPDATE lot SET winner_id = $user WHERE id = $lot";
+    
+            $result_winner = mysqli_query($connect, $sql_winner);
+    
+            if (!$result_winner) {
+                $error = mysqli_error($connect);
+                echo 'Ошибка MySQL: ' . $error;
+            }
         }
     }
 }

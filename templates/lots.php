@@ -21,8 +21,8 @@
                 <p class="lot-item__description"><?= htmlspecialchars($lot['description']); ?></p>
             </div>
             <div class="lot-item__right">
-                <?php [$hours, $minutes] = get_dt_range($lot['date_finish']);
-                if ($is_auth && ((int)$hours > 0 || (int)$minutes > 0) && empty($errors_user) && (int)$user_id_last_rate !== (int)$_SESSION['id'])  : ?>
+                <?php [$hours, $minutes] = get_dt_range($lot['date_finish']); ?>
+                <?php if ($is_auth && ((int)$hours > 0 || (int)$minutes > 0) && empty($errors_user) && (int)$user_id_last_rate !== (int)$_SESSION['id'])  : ?>
                     <div class="lot-item__state">
                         <div
                             class="lot-item__timer timer <?php if ((int)$hours === 0) : ?> timer--finishing <?php endif; ?>">
@@ -78,7 +78,7 @@
                                 </tr>
                             <?php endforeach; ?>
                         </table>
-                    <? endif; ?>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

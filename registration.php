@@ -58,7 +58,7 @@ if (
         }
     }
 
-    if (check_email($connect, $email)) {
+    if (check_email($connect, $email) !== null) {
         $errors['email'] = check_email($connect, $email);
     } elseif (show_errors('email', 72, 'Введите email', 'Слишком длинный email')) {
         $errors['email'] = show_errors('email', 72, 'Введите email', 'Слишком длинный email');

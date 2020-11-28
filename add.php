@@ -22,10 +22,14 @@ $errors = [];
 
 $is_auth = false;
 
-if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+
+if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+    session_unset();
+    header('Location: /index.php');
+} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
-} else {
+} elseif(!isset($_SESSION['auth'])) {
     http_response_code(403);
     header('Location: user-login.php');
     die();

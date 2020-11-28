@@ -158,7 +158,7 @@ function validate_price($price)
  * @param string $show_one описание первой ошибки
  * @param string $show_two описание второй ошибки
  *
- * @return string|null возвращает наименование ошибки, если валидация не прошла
+ * @return string возвращает наименование ошибки, если валидация не прошла
  */
 function show_errors(string $name, int $max, string $show_one, string $show_two)
 {
@@ -166,6 +166,8 @@ function show_errors(string $name, int $max, string $show_one, string $show_two)
         return $errors[$name] = $show_one;
     } elseif (isCorrectLength($name, $max)) {
         return $errors[$name] = $show_two;
+    } else {
+        return $errors[$name] = null;  
     }
 }
 
@@ -226,7 +228,7 @@ function get_rates_lots_user($link, string $user_id)
 
     $fetch_rate = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
 
-    if ($fetch_rate == []) {
+    if ($fetch_rate === []) {
         $fetch_rate = null;
     }
 
@@ -266,11 +268,46 @@ function get_lot($link, int $lot_id)
 
     $fetch_lot = mysqli_fetch_assoc($result_lot);
 
-    if ($fetch_lot == []) {
+    if ($fetch_lot === []) {
         $fetch_lot = null;
     }
 
     return $fetch_lot;
+}
+
+/**
+ * Возвращает данные пользователя.
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param int $sess_id id пользователя в сессии
+ *
+ * @return array|null массив данных пользователя
+ */
+function get_all_data_user($link, int $sess_id)
+{
+    $sql_id_user = 'SELECT * FROM user WHERE user.id = ?';
+
+    $stmt = mysqli_prepare($link, $sql_id_user);
+
+    mysqli_stmt_bind_param($stmt, 'i', $sess_id);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_id_user = mysqli_stmt_get_result($stmt);
+
+    if (!$result_id_user) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: ' . $error;
+        die();
+    }
+
+    $fetch_id_user = mysqli_fetch_assoc($result_id_user);
+
+    if ($fetch_id_user === []) {
+        $fetch_id_user = null;
+    }
+
+    return $fetch_id_user;
 }
 
 /**
@@ -365,7 +402,7 @@ function get_list_id_category($link, int $category_id)
 
     $fetch_id_category = mysqli_fetch_assoc($result_id_category);
 
-    if ($fetch_id_category == []) {
+    if ($fetch_id_category === []) {
         $fetch_id_category = null;
     }
 
@@ -380,7 +417,7 @@ function get_list_id_category($link, int $category_id)
  * @param int $page_items лимит показа лотов на странице
  * @param int $offset смещение
  *
- * @return int количество категорий
+ * @return array|null список активных лотов по категории
  */
 function get_lot_category_count($link, int $category_id, int $page_items, int $offset)
 {
@@ -408,7 +445,96 @@ function get_lot_category_count($link, int $category_id, int $page_items, int $o
 
     $fetch_lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
+    if ($fetch_lots == []) {
+        $fetch_lots = null;
+    }
+
     return $fetch_lots;
+}
+
+/**
+ * Получение списка активных лотов.
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param int $page_items лимит показа лотов на странице
+ * @param int $offset смещение
+ *
+ * @return array|null список активных лотов
+ */
+function get_lots_active($link, int $page_items, int $offset)
+{
+    $sql_lots_active = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+    FROM lot
+        JOIN category ON lot.category_id = category.id
+        LEFT JOIN rate ON rate.lot_id = lot.id
+            WHERE date_finish > NOW()
+            GROUP BY lot.id
+            ORDER BY lot.date_start DESC LIMIT ? OFFSET ?';
+
+    $stmt = mysqli_prepare($link, $sql_lots_active);
+
+    mysqli_stmt_bind_param($stmt, 'ii', $page_items, $offset);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_lots_active = mysqli_stmt_get_result($stmt);
+
+    if (!$result_lots_active) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: ' . $error;
+        die();
+    }
+
+    $fetch_lots_active = mysqli_fetch_all($result_lots_active, MYSQLI_ASSOC);
+
+    if ($fetch_lots_active == []) {
+        $fetch_lots_active = null;
+    }
+
+    return $fetch_lots_active;
+}
+
+/**
+ * Получение списка активных лотов по поисковому запросу
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param string $against поисковый запрос
+ * @param int $page_items лимит показа лотов на странице
+ * @param int $offset смещение
+ *
+ * @return array|null список активных лотов по поисковому запросу
+ */
+function get_lots_active_search($link, string $against, int $page_items, int $offset)
+{
+    $sql_lots_active_search = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+    FROM lot
+        JOIN category ON lot.category_id = category.id
+        LEFT JOIN rate ON rate.lot_id = lot.id
+            WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)
+            GROUP BY lot.id
+            ORDER BY lot.date_start DESC LIMIT ? OFFSET ?';
+
+    $stmt = mysqli_prepare($link, $sql_lots_active_search);
+
+    mysqli_stmt_bind_param($stmt, 'sii', $against, $page_items, $offset);
+
+    mysqli_stmt_execute($stmt);
+
+    $result_lots_active_search = mysqli_stmt_get_result($stmt);
+
+    if (!$result_lots_active_search) {
+        $error = mysqli_error($link);
+        echo 'Ошибка MySQL: ' . $error;
+        die();
+    }
+
+    $fetch_lots_active_search = mysqli_fetch_all($result_lots_active_search, MYSQLI_ASSOC);
+
+    if ($fetch_lots_active_search == []) {
+        $fetch_lots_active_search = null;
+    }
+
+    return $fetch_lots_active_search;
 }
 
 /**
@@ -444,7 +570,7 @@ function get_lot_rates($link, int $lot_id)
 
     $fetch_rate = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
 
-    if ($fetch_rate == []) {
+    if ($fetch_rate === []) {
         $fetch_rate = null;
     }
 
@@ -507,7 +633,11 @@ function check_email($link, string $data)
         die();
     }
 
-    if (mysqli_num_rows($result_email)) {
+    $fetch_email = mysqli_fetch_assoc($result_email);
+
+    if ($fetch_email === null) {
+        $errors = null;
+    } elseif (mysqli_num_rows($result_email)) {
         $errors = 'Данный email уже используется';
     }
 
@@ -577,7 +707,7 @@ function get_data_user($link, string $data)
 
     $fetch_data_user = mysqli_fetch_all($result_data_user, MYSQLI_ASSOC);
 
-    if ($fetch_data_user == []) {
+    if ($fetch_data_user === []) {
         $fetch_data_user = null;
     }
 
@@ -612,7 +742,7 @@ function get_user_id_create_lot($link, int $data)
 
     $fetch_user_id = mysqli_fetch_assoc($result_user_id);
 
-    if ($fetch_user_id == []) {
+    if ($fetch_user_id === []) {
         $fetch_user_id = null;
     }
 
@@ -650,7 +780,7 @@ function get_user_id_last_rate($link, int $data)
 
     $fetch_rate_user_id = mysqli_fetch_assoc($result_rate_user_id);
 
-    if ($fetch_rate_user_id == []) {
+    if ($fetch_rate_user_id === []) {
         $fetch_rate_user_id = null;
     }
 

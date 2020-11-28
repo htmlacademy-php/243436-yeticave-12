@@ -35,26 +35,27 @@ if (
         $errors['email'] = 'Введите email';
     } elseif (validateEmail('email')) {
         $errors['email'] = 'Введите корректный email';
-    } elseif (!check_email($connect, $email)) {
+    } elseif (check_email($connect, $email) === null) {
         $errors['email'] = 'Данный email не зарегистрирован';
-    }
+    } else {
 
-    $data_user = get_data_user($connect, $_POST['email']);
+        $data_user = get_data_user($connect, $_POST['email']);
 
-    if (validateFilled('password')) {
-        $errors['password'] = 'Введите пароль';
-    } elseif (!password_verify($_POST['password'], $data_user[0]['password'])) {
-        $errors['password'] = 'Вы ввели неверный пароль';
-    }
+        if (validateFilled('password')) {
+            $errors['password'] = 'Введите пароль';
+        } elseif (!password_verify($_POST['password'], $data_user[0]['password'])) {
+            $errors['password'] = 'Вы ввели неверный пароль';
+        }
 
-    if (empty($errors)) {
-        $user_name = $data_user[0]['name'];
-        $user_id = $data_user[0]['id'];
-        $_SESSION['auth'] = true;
-        $_SESSION['name'] = $user_name;
-        $_SESSION['id'] = $user_id;
-        header('Location: index.php');
-        die();
+        if (empty($errors)) {
+            $user_name = $data_user[0]['name'];
+            $user_id = $data_user[0]['id'];
+            $_SESSION['auth'] = true;
+            $_SESSION['name'] = $user_name;
+            $_SESSION['id'] = $user_id;
+            header('Location: index.php');
+            die();
+        }
     }
 }
 

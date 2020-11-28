@@ -15,7 +15,10 @@ $back_page = '';
 
 $is_auth = false;
 
-if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+    session_unset();
+    header('Location: /index.php');
+} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
 }
@@ -33,42 +36,23 @@ if (!$result_lots) {
 
 $lots = (int)mysqli_fetch_assoc($result_lots)['count'];
 
-if (isset($_GET['page']) && $_GET['page'] === '') {
+$page_items = 9;
+$pages_count = ceil($lots / $page_items);
+
+if (isset($_GET['page']) && ($_GET['page'] === '' || (int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
     header('Location: 404.php');
+    die();
 } elseif (!isset($_GET['page'])) {
     $cur_page = 1;
 } else {
     $cur_page = (int)$_GET['page'];
 }
 
-$page_items = 9;
-
-$pages_count = ceil($lots / $page_items);
 $offset = ($cur_page - 1) * $page_items;
-
-if (isset($_GET['page']) && ((int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
-    header('Location: 404.php');
-    die();
-}
 
 $pages = range(1, $pages_count);
 
-$sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
-    FROM lot
-        JOIN category ON lot.category_id = category.id
-        LEFT JOIN rate ON rate.lot_id = lot.id
-            WHERE date_finish > NOW()
-            GROUP BY lot.id
-            ORDER BY lot.date_start DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
-
-$result_lots = mysqli_query($connect, $sql_lots);
-
-if (!$result_lots) {
-    $error = mysqli_error($connect);
-    echo 'Ошибка MySQL: ' . $error;
-}
-
-$lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
+$lots = get_lots_active($connect, $page_items, $offset);
 
 $page_content = include_template('main.php', [
     'categories' => $categories,

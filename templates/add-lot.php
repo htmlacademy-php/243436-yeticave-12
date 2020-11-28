@@ -1,11 +1,17 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
+        <?php if($categories === null) : ?>
+            <?= ''; ?>
+        <?php else :?>
             <?php foreach ($categories as $category): ?>
-                <li class="nav__item">
+                <li class="nav__item <?php if (isset($_GET['category_id']) && ((int)$category['id'] === (int)$_GET['category_id'])) {
+                    echo 'nav__item--current';
+                } ?>">
                     <a href="all-lots.php?category_id=<?= (int)$category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
                 </li>
             <?php endforeach; ?>
+        <?php endif; ?>
         </ul>
     </nav>
     <form class="form form--add-lot container <?= !empty($errors) ? 'form--invalid' : ''; ?>" action="add.php"
@@ -16,16 +22,20 @@
                 <label for="lot-name">Наименование <sup>*</sup></label>
                 <input id="lot-name" type="text" name="lot-name" placeholder="Введите наименование лота"
                        value="<?= htmlspecialchars($lot_name); ?>">
-                <span class="form__error"><?= $errors['lot-name'] ?? ''; ?></span>
+                <span class="form__error"><?= isset($errors['lot-name']) ? $errors['lot-name'] : ''; ?></span>
             </div>
             <div class="form__item <?= isset($errors['category']) ? 'form__item--invalid' : ''; ?>">
                 <label for="category">Категория <sup>*</sup></label>
                 <select id="category" name="category">
                     <option>Выберите категорию</option>
-                    <?php foreach ($categories as $category): ?>
-                        <option
-                            value="<?= (int)$category['id']; ?>" <?= (int)$category['id'] === (int)$select_category ? 'selected' : ''; ?> ><?= htmlspecialchars($category['name']); ?></option>
-                    <?php endforeach; ?>
+                    <?php if($categories === null) : ?>
+                        <?= ''; ?>
+                    <?php else :?>
+                        <?php foreach ($categories as $category): ?>
+                            <option
+                                value="<?= (int)$category['id']; ?>" <?= (int)$category['id'] === (int)$select_category ? 'selected' : ''; ?> ><?= htmlspecialchars($category['name']); ?></option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </select>
                 <span class="form__error">Выберите категорию</span>
             </div>
@@ -52,14 +62,14 @@
                 <label for="lot-rate">Начальная цена <sup>*</sup></label>
                 <input id="lot-rate" type="text" name="lot-rate" placeholder="0"
                        value="<?= htmlspecialchars($lot_rate); ?>">
-                <span class="form__error"><?= $errors['lot-rate'] ?? ''; ?></span>
+                <span class="form__error"><?= isset($errors['lot-rate']) ? $errors['lot-rate'] : '' ?></span>
             </div>
             <div
                 class="form__item form__item--small <?= isset($errors['lot-step']) || validate_price('lot-step') === 'form__item--invalid' ? 'form__item--invalid' : ''; ?>">
                 <label for="lot-step">Шаг ставки <sup>*</sup></label>
                 <input id="lot-step" type="text" name="lot-step" placeholder="0"
                        value="<?= htmlspecialchars($lot_step); ?>">
-                <span class="form__error"><?= $errors['lot-step'] ?? ''; ?></span>
+                <span class="form__error"><?= isset($errors['lot-step']) ? $errors['lot-step'] : '' ?>></span>
             </div>
             <div class="form__item <?= isset($errors['lot-date']) ? 'form__item--invalid' : ''; ?>">
                 <label for="lot-date">Дата окончания торгов <sup>*</sup></label>

@@ -19,7 +19,10 @@ $cur_page = '';
 
 $is_auth = false;
 
-if (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+    session_unset();
+    header('Location: /index.php');
+} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
 }
@@ -49,49 +52,24 @@ if (!isset($_GET['search']) || (isset($_GET['search']) && $_GET['search'] === ''
 
     $lots = mysqli_fetch_assoc($res)['count'];
 
-    if (isset($_GET['page']) && $_GET['page'] === '') {
+    $page_items = 9;
+
+    $pages_count = ceil($lots / $page_items);
+
+    if (isset($_GET['page']) && ($_GET['page'] === '' || (int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
         header('Location: 404.php');
+        die();
     } elseif (!isset($_GET['page'])) {
         $cur_page = 1;
     } else {
         $cur_page = (int)$_GET['page'];
     }
 
-    $page_items = 9;
-
-    $pages_count = ceil($lots / $page_items);
     $offset = ($cur_page - 1) * $page_items;
-
-    if (isset($_GET['page']) && ((int)$_GET['page'] > (int)$pages_count || (int)$_GET['page'] <= 0)) {
-        header('Location: 404.php');
-        die();
-    }
 
     $pages = range(1, $pages_count);
 
-    $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
-    FROM lot
-        JOIN category ON lot.category_id = category.id
-        LEFT JOIN rate ON rate.lot_id = lot.id
-            WHERE date_finish > NOW() AND MATCH(title,description) AGAINST(?)
-            GROUP BY lot.id
-            ORDER BY lot.date_start DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
-
-    $stmt = mysqli_prepare($connect, $sql_lots);
-
-    mysqli_stmt_bind_param($stmt, 's', $_GET['search']);
-
-    mysqli_stmt_execute($stmt);
-
-    $res = mysqli_stmt_get_result($stmt);
-
-    if (!$res) {
-        $error = mysqli_error($connect);
-        echo 'Ошибка MySQL: ' . $error;
-        die();
-    }
-
-    $lots = mysqli_fetch_all($res, MYSQLI_ASSOC);
+    $lots = get_lots_active_search($connect, $search, $page_items, $offset);
 }
 
 $page_content = include_template('search-result.php', [

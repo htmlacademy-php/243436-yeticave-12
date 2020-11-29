@@ -39,7 +39,7 @@ CREATE TABLE user (
   email VARCHAR(72) NOT NULL,
 	name VARCHAR(100) NOT NULL,	
 	password CHAR(64) NOT NULL,
-	contact VARCHAR(20) NOT NULL
+	contact VARCHAR(255) NOT NULL
 );
 
 ALTER TABLE lot ADD FOREIGN KEY (user_id) REFERENCES user(id);

@@ -1,11 +1,4 @@
-.DS_Store
-.idea
-*.ai
-*.log
-*.pdf
-*.psd
-*.sublime*
-Thumbs.db
+.php_cs.cache
+.idea/
+uploads/
 vendor
-uploads/*
-!uploads/.gitkeep

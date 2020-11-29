@@ -1,14 +1,12 @@
 <main>
     <nav class="nav">
         <ul class="nav__list container">
-            <?php if($categories === null) : ?>
-                <?= ''; ?>
-            <?php else :?>
-                <?php foreach ($categories as $category): ?>
-                    <li class="nav__item <?php if (isset($_GET['category_id']) && ((int)$category['id'] === (int)$_GET['category_id'])) {
-                        echo 'nav__item--current';
-                    } ?>">
-                        <a href="all-lots.php?category_id=<?= (int)$category['id']; ?>"><?= htmlspecialchars($category['name']); ?></a>
+            <?php if ($categories !== null) : ?>
+                <?php foreach ($categories as $category) : ?>
+                    <li class="nav__item">
+                        <a href="all-lots.php?category_id=<?= (int)$category['id']; ?>">
+                            <?= htmlspecialchars($category['name']); ?>
+                        </a>
                     </li>
                 <?php endforeach; ?>
             <?php endif; ?>
@@ -16,27 +14,30 @@
     </nav>
     <section class="rates container">
         <h2>Мои ставки</h2>
-        <?php if($rates === null) : ?>
+        <?php if ($rates === null) : ?>
         <p>Ставок нет</p>
         <?php else : ?>
         <table class="rates__list">
-            <?php foreach ($rates as $value): ?>
-                <tr class="rates__item <?php [$hours, $minutes, $second] = get_dt_range($value['lot_date_finish']);
-                if ((int)$value['winner_id'] === (int)$user_id) {
-                    echo 'rates__item--win';
-                } elseif ((int)$hours <= 0 && (int)$minutes <= 0 && (int)$second <= 0) {
-                    echo 'rates__item--end';
-                } ?>">
+            <?php foreach ($rates as $value) : ?>
+                <?php [$hours, $minutes, $second] = get_dt_range($value['lot_date_finish']); ?>
+                <tr class="rates__item 
+                <?php if ((int)$value['winner_id'] === (int)$user_id) : ?>
+                    rates__item--win
+                <?php elseif ((int)$hours <= 0 && (int)$minutes <= 0 && (int)$second <= 0) : ?> 
+                    rates__item--end
+                <?php endif; ?>">
                     <td class="rates__info">
                         <div class="rates__img">
                             <img src="<?= htmlspecialchars($value['img_path']); ?>" width="54" height="40"
                                  alt="Сноуборд">
                         </div>
                         <div>
-                            <h3 class="rates__title"><a
-                                    href="lot.php?id=<?= (int)$value['lot_id']; ?>"><?= htmlspecialchars($value['lot_name']); ?></a>
+                            <h3 class="rates__title">
+                                <a href="lot.php?id=<?= (int)$value['lot_id']; ?>">
+                                    <?= htmlspecialchars($value['lot_name']); ?>
+                                </a>
                             </h3>
-                            <?php if ((int)$value['winner_id'] === (int)$user_id): ?>
+                            <?php if ((int)$value['winner_id'] === (int)$user_id) : ?>
                                 <p><?= htmlspecialchars($value['contact']); ?></p>
                             <?php endif; ?>
                         </div>
@@ -45,17 +46,15 @@
                         <?= htmlspecialchars($value['category_name']); ?>
                     </td>
                     <td class="rates__timer">
-                        <?php if ((int)$value['winner_id'] === (int)$user_id): ?>
+                        <?php if ((int)$value['winner_id'] === (int)$user_id) : ?>
                             <div class="timer timer--win">Ставка выиграла</div>
-                        <?php elseif ((int)$hours <= 0 && (int)$minutes <= 0 && (int)$second <= 0): ?>
+                        <?php elseif ((int)$hours <= 0 && (int)$minutes <= 0 && (int)$second <= 0) : ?>
                             <div class="timer timer--end">Торги окончены</div>
-                        <?php else: ?>
-                        <div class="timer <?php if ((int)$hours === 0) : ?> timer--finishing <?php endif; ?>">
-                            <?php
-                            echo "{$hours}:{$minutes}:{$second}";
-                            ?>
-                            <?php endif; ?>
+                        <?php else : ?>
+                        <div class="timer <?php (int)$hours === 0 ? 'timer--finishing' : '' ?>">
+                            <?= "{$hours}:{$minutes}:{$second}"; ?>
                         </div>
+                        <?php endif; ?>
                     </td>
                     <td class="rates__price">
                         <?= htmlspecialchars(get_sum($value['rate_cost'])); ?>

@@ -143,8 +143,11 @@ function validate_price($price)
     $invalid_price = '';
 
     if (isset($_POST[$price])) {
-        $invalid_price = !filter_var($_POST[$price], FILTER_VALIDATE_INT,
-            ['options' => ['min_range' => 1]]) ? 'form__item--invalid' : $_POST[$price];
+        $invalid_price = !filter_var(
+            $_POST[$price],
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        ) ? 'form__item--invalid' : $_POST[$price];
     }
 
     return $invalid_price;
@@ -167,7 +170,7 @@ function show_errors(string $name, int $max, string $show_one, string $show_two)
     } elseif (isCorrectLength($name, $max)) {
         return $errors[$name] = $show_two;
     } else {
-        return $errors[$name] = null;  
+        return $errors[$name] = null;
     }
 }
 
@@ -204,7 +207,9 @@ function get_categories($connect)
  */
 function get_rates_lots_user($link, string $user_id)
 {
-    $sql_rate = 'SELECT rate.user_id AS user_id, rate.lot_id AS lot_id, rate.cost AS rate_cost, rate.date AS rate_date, lot.path AS img_path, lot.title AS lot_name, lot.category_id AS category_id, lot.date_finish AS lot_date_finish, category.name AS category_name, lot.winner_id AS winner_id, user.contact AS contact
+    $sql_rate = 'SELECT rate.user_id AS user_id, rate.lot_id AS lot_id, rate.cost AS rate_cost, rate.date AS rate_date,
+     lot.path AS img_path, lot.title AS lot_name, lot.category_id AS category_id, lot.date_finish AS lot_date_finish,
+     category.name AS category_name, lot.winner_id AS winner_id, user.contact AS contact
     FROM rate
       JOIN lot ON lot.id = rate.lot_id
       JOIN user ON user.id = rate.user_id
@@ -245,7 +250,8 @@ function get_rates_lots_user($link, string $user_id)
  */
 function get_lot($link, int $lot_id)
 {
-    $sql_lot = 'SELECT lot.rate_step, date_finish, description, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+    $sql_lot = 'SELECT lot.rate_step, date_finish, description, category.name AS category, title, path,
+     IFNULL(MAX(rate.cost), lot.cost) AS current_price
       FROM lot
           JOIN category ON lot.category_id = category.id
           LEFT JOIN rate ON rate.lot_id = lot.id
@@ -421,7 +427,9 @@ function get_list_id_category($link, int $category_id)
  */
 function get_lot_category_count($link, int $category_id, int $page_items, int $offset)
 {
-    $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, lot.category_id AS category_id, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price, (SELECT COUNT(*) FROM rate WHERE rate.lot_id = lot.id) AS count_rate
+    $sql_lots = 'SELECT lot.id, date_finish, category.name AS category, lot.category_id AS category_id, title, path,
+     IFNULL(MAX(rate.cost), lot.cost) AS current_price,
+     (SELECT COUNT(*) FROM rate WHERE rate.lot_id = lot.id) AS count_rate
     FROM lot
       JOIN category ON lot.category_id = category.id
       LEFT JOIN rate ON rate.lot_id = lot.id
@@ -445,7 +453,7 @@ function get_lot_category_count($link, int $category_id, int $page_items, int $o
 
     $fetch_lots = mysqli_fetch_all($result_lots, MYSQLI_ASSOC);
 
-    if ($fetch_lots == []) {
+    if ($fetch_lots === []) {
         $fetch_lots = null;
     }
 
@@ -463,7 +471,8 @@ function get_lot_category_count($link, int $category_id, int $page_items, int $o
  */
 function get_lots_active($link, int $page_items, int $offset)
 {
-    $sql_lots_active = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+    $sql_lots_active = 'SELECT lot.id, date_finish, category.name AS category, title, path,
+     IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id
@@ -487,7 +496,7 @@ function get_lots_active($link, int $page_items, int $offset)
 
     $fetch_lots_active = mysqli_fetch_all($result_lots_active, MYSQLI_ASSOC);
 
-    if ($fetch_lots_active == []) {
+    if ($fetch_lots_active === []) {
         $fetch_lots_active = null;
     }
 
@@ -506,7 +515,8 @@ function get_lots_active($link, int $page_items, int $offset)
  */
 function get_lots_active_search($link, string $against, int $page_items, int $offset)
 {
-    $sql_lots_active_search = 'SELECT lot.id, date_finish, category.name AS category, title, path, IFNULL(MAX(rate.cost), lot.cost) AS current_price
+    $sql_lots_active_search = 'SELECT lot.id, date_finish, category.name AS category, title, path,
+     IFNULL(MAX(rate.cost), lot.cost) AS current_price
     FROM lot
         JOIN category ON lot.category_id = category.id
         LEFT JOIN rate ON rate.lot_id = lot.id
@@ -530,7 +540,7 @@ function get_lots_active_search($link, string $against, int $page_items, int $of
 
     $fetch_lots_active_search = mysqli_fetch_all($result_lots_active_search, MYSQLI_ASSOC);
 
-    if ($fetch_lots_active_search == []) {
+    if ($fetch_lots_active_search === []) {
         $fetch_lots_active_search = null;
     }
 
@@ -587,7 +597,8 @@ function get_lot_rates($link, int $lot_id)
  */
 function insert_lot($link, array $data = [])
 {
-    $sql_lot = 'INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id, category_id)
+    $sql_lot = 'INSERT INTO lot(date_start, title, description, path, cost, date_finish, rate_step, user_id,
+     category_id)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)';
 
     $prepare = db_get_prepare_stmt($link, $sql_lot, $data);
@@ -844,11 +855,16 @@ function get_time_rate(string $rate_time)
     $result_time_sec = floor((($now_time - $past_time) % 3600) % 60);
     $result_all_second = $now_time - $past_time;
 
-    if ($result_time_hour == 0 && $result_time_min == 0 && $result_time_sec < 60) {
+    if ($result_time_hour === 0 && $result_time_min === 0 && $result_time_sec < 60) {
         $time_public = 'только что';
-    } elseif ($result_time_hour == 0 && $result_time_min < 60 && $result_time_min >= 1) {
-        $time_public = $result_time_min . get_noun_plural_form($result_time_min, ' минуту', ' минуты', ' минут',
-                ' минута') . ' назад';
+    } elseif ($result_time_hour === 0 && $result_time_min < 60 && $result_time_min >= 1) {
+        $time_public = $result_time_min . get_noun_plural_form(
+            $result_time_min,
+            ' минуту',
+            ' минуты',
+            ' минут',
+            ' минута'
+        ) . ' назад';
     } elseif ($result_time_hour >= 1 && $result_all_second < 7200) {
         $time_public = 'Час назад';
     } elseif ($result_all_second >= 7200) {

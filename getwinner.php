@@ -1,17 +1,21 @@
 <?php
 
-$connect = db_connect();
 require_once 'vendor/autoload.php';
 
+$connect = db_connect();
+
 $user_name = '';
+
 $lot_name = '';
+
 $lot_id = '';
 
 $transport = (new Swift_SmtpTransport('phpdemo.ru', 25));
 $transport->setUsername('keks@phpdemo.ru');
 $transport->setPassword('htmlacademy');
 
-$sql_rate_winner = 'SELECT  rate.lot_id AS lot_id, rate.cost AS rate_cost, rate.user_id AS user_id, lot.winner_id AS winner_id, lot.title AS lot_name, user.name AS user_name, user.email AS user_email
+$sql_rate_winner = 'SELECT  rate.lot_id AS lot_id, rate.cost AS rate_cost, rate.user_id AS user_id,
+ lot.winner_id AS winner_id, lot.title AS lot_name, user.name AS user_name, user.email AS user_email
     FROM rate
       JOIN lot ON lot.id = rate.lot_id
       JOIN user ON user.id = rate.user_id
@@ -32,7 +36,7 @@ if (!$result_rate_winner) {
 
 $winners = mysqli_fetch_all($result_rate_winner, MYSQLI_ASSOC);
 
-if(!empty($winners)) {
+if (!empty($winners)) {
     foreach ($winners as $winner) {
         $message = (new Swift_Message('Ваша ставка победила'));
         $message->setFrom(['keks@phpdemo.ru' => 'keks@phpdemo.ru']);
@@ -42,8 +46,14 @@ if(!empty($winners)) {
         $lot_name = $winner['lot_name'];
         $lot_id = (int)$winner['lot_id'];
     
-        $message_content = include_template('email.php',
-            ['user_name' => $user_name, 'lot_name' => $lot_name, 'lot_id' => $lot_id]);
+        $message_content = include_template(
+            'email.php',
+            [
+            'user_name' => $user_name,
+            'lot_name' => $lot_name,
+            'lot_id' => $lot_id
+            ]
+        );
         $message->setBody($message_content, 'text/html');
     
         $mailer = new Swift_Mailer($transport);

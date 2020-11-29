@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+
 require_once 'helpers.php';
 require_once 'functions.php';
 
@@ -11,6 +12,7 @@ $title = 'Вход';
 $user_name = '';
 
 $email = '';
+
 $password = '';
 
 $errors = [];
@@ -24,9 +26,8 @@ if (isset($_SESSION['auth'])) {
 
 $categories = get_categories($connect);
 
-if (
-    isset($_POST['email']) &&
-    isset($_POST['password'])
+if (isset($_POST['email'])
+    && isset($_POST['password'])
 ) {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -38,7 +39,6 @@ if (
     } elseif (check_email($connect, $email) === null) {
         $errors['email'] = 'Данный email не зарегистрирован';
     } else {
-
         $data_user = get_data_user($connect, $_POST['email']);
 
         if (validateFilled('password')) {
@@ -59,15 +59,25 @@ if (
     }
 }
 
-$page_content = include_template('login.php',
-    ['categories' => $categories, 'errors' => $errors, 'email' => $email, 'password' => $password]);
+$page_content = include_template(
+    'login.php',
+    [
+    'categories' => $categories,
+    'errors' => $errors,
+    'email' => $email,
+    'password' => $password
+    ]
+);
 
-$layout_content = include_template('layout.php', [
+$layout_content = include_template(
+    'layout.php',
+    [
     'content' => $page_content,
     'categories' => $categories,
     'title' => $title,
     'user_name' => $user_name,
     'is_auth' => $is_auth
-]);
+    ]
+);
 
 echo $layout_content;

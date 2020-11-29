@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+
 require_once 'helpers.php';
 require_once 'functions.php';
 
@@ -11,11 +12,17 @@ $title = 'Добавление лота';
 $user_name = '';
 
 $lot_name = '';
+
 $select_category = '';
+
 $message = '';
+
 $lot_rate = '';
+
 $lot_step = '';
+
 $lot_date = '';
+
 $file_url = '';
 
 $errors = [];
@@ -23,13 +30,18 @@ $errors = [];
 $is_auth = false;
 
 
-if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+if (isset($_SESSION['id'])
+    && get_all_data_user($connect, (int) $_SESSION['id']) === null
+) {
     session_unset();
     header('Location: /index.php');
-} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+    die();
+} elseif (isset($_SESSION['name'])
+    && isset($_SESSION['auth'])
+) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
-} elseif(!isset($_SESSION['auth'])) {
+} elseif (!isset($_SESSION['auth'])) {
     http_response_code(403);
     header('Location: user-login.php');
     die();
@@ -37,13 +49,12 @@ if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) 
 
 $categories = get_categories($connect);
 
-if (
-    isset($_POST['lot-name']) &&
-    isset($_POST['category']) &&
-    isset($_POST['message']) &&
-    isset($_POST['lot-rate']) &&
-    isset($_POST['lot-step']) &&
-    isset($_POST['lot-date'])
+if (isset($_POST['lot-name'])
+    && isset($_POST['category'])
+    && isset($_POST['message'])
+    && isset($_POST['lot-rate'])
+    && isset($_POST['lot-step'])
+    && isset($_POST['lot-date'])
 ) {
     $lot_name = $_POST['lot-name'];
     $select_category = $_POST['category'];
@@ -77,7 +88,12 @@ if (
         }
     }
 
-    $errors['lot-name'] = show_errors('lot-name', 700, 'Введите наименование лота', 'Слишком длинное наименование');
+    $errors['lot-name'] = show_errors(
+        'lot-name',
+        700,
+        'Введите наименование лота',
+        'Слишком длинное наименование'
+    );
 
     if (show_errors('lot-rate', 10, 'Введите начальную цену', 'Слишком большое число')) {
         $errors['lot-rate'] = show_errors('lot-rate', 10, 'Введите начальную цену', 'Слишком большое число');
@@ -97,15 +113,20 @@ if (
         $errors['lot-img'] = 'form--invalid';
     }
 
-    if ($_POST['category'] === 'Выберите категорию' || check_id_category($connect, $select_category)) {
+    if ($_POST['category'] === 'Выберите категорию'
+        || check_id_category($connect, $select_category)
+    ) {
         $errors['category'] = 'form--invalid';
     }
 
-    $errors['lot-date'] = !is_date_valid($_POST['lot-date']) || (strtotime($_POST['lot-date']) - time()) < 0 ? 'form--invalid' : '';
+    $errors['lot-date'] = !is_date_valid($_POST['lot-date']) || (strtotime($_POST['lot-date']) - time()) < 0 ?
+    'form--invalid' : '';
 
     $errors = array_filter($errors);
 
-    if (isset($_FILES['lot-img']) && !empty($_FILES['lot-img']['name'])) {
+    if (isset($_FILES['lot-img'])
+        && !empty($_FILES['lot-img']['name'])
+    ) {
         $file_name = $_FILES['lot-img']['name'];
         $file_path = __DIR__ . '/uploads/';
         $file_url = 'uploads/' . $file_name;
@@ -126,7 +147,17 @@ if (
     $date_start = date('Y-m-d H:i:s', time());
     $user_id = (int)$_SESSION['id'];
 
-    $data = [$date_start, $lot_name, $message, $file_url, $lot_rate, $lot_date, $lot_step, $user_id, $select_category];
+    $data = [
+        $date_start,
+        $lot_name,
+        $message,
+        $file_url,
+        $lot_rate,
+        $lot_date,
+        $lot_step,
+        $user_id,
+        $select_category
+    ];
 
     if (empty($errors)) {
         $lot_id = insert_lot($connect, $data);
@@ -135,7 +166,9 @@ if (
     }
 }
 
-$page_content = include_template('add-lot.php', [
+$page_content = include_template(
+    'add-lot.php',
+    [
     'categories' => $categories,
     'lot_name' => $lot_name,
     'select_category' => $select_category,
@@ -144,14 +177,18 @@ $page_content = include_template('add-lot.php', [
     'lot_step' => $lot_step,
     'lot_date' => $lot_date,
     'errors' => $errors
-]);
+    ]
+);
 
-$layout_content = include_template('layout.php', [
+$layout_content = include_template(
+    'layout.php',
+    [
     'content' => $page_content,
     'categories' => $categories,
     'title' => $title,
     'user_name' => $user_name,
     'is_auth' => $is_auth
-]);
+    ]
+);
 
 echo $layout_content;

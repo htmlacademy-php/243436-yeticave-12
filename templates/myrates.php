@@ -51,7 +51,7 @@
                         <?php elseif ((int)$hours <= 0 && (int)$minutes <= 0 && (int)$second <= 0) : ?>
                             <div class="timer timer--end">Торги окончены</div>
                         <?php else : ?>
-                        <div class="timer <?php (int)$hours === 0 ? 'timer--finishing' : '' ?>">
+                        <div class="timer <?= (int)$hours === 0 ? 'timer--finishing' : '' ?>">
                             <?= "{$hours}:{$minutes}:{$second}"; ?>
                         </div>
                         <?php endif; ?>

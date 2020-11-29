@@ -855,9 +855,9 @@ function get_time_rate(string $rate_time)
     $result_time_sec = floor((($now_time - $past_time) % 3600) % 60);
     $result_all_second = $now_time - $past_time;
 
-    if ($result_time_hour === 0 && $result_time_min === 0 && $result_time_sec < 60) {
+    if ((int)$result_time_hour === 0 && (int)$result_time_min === 0 && (int)$result_time_sec < 60) {
         $time_public = 'только что';
-    } elseif ($result_time_hour === 0 && $result_time_min < 60 && $result_time_min >= 1) {
+    } elseif ((int)$result_time_hour === 0 && (int)$result_time_min < 60 && (int)$result_time_min >= 1) {
         $time_public = $result_time_min . get_noun_plural_form(
             $result_time_min,
             ' минуту',
@@ -865,9 +865,9 @@ function get_time_rate(string $rate_time)
             ' минут',
             ' минута'
         ) . ' назад';
-    } elseif ($result_time_hour >= 1 && $result_all_second < 7200) {
+    } elseif ((int)$result_time_hour >= 1 && (int)$result_all_second < 7200) {
         $time_public = 'Час назад';
-    } elseif ($result_all_second >= 7200) {
+    } elseif ((int)$result_all_second >= 7200) {
         $time_public = date('d.m.y', $past_time) . ' в ' . date('H:i', $past_time);
     }
 

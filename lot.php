@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 require_once 'helpers.php';
 require_once 'functions.php';
 
@@ -19,10 +20,15 @@ $errors_user = [];
 
 $is_auth = false;
 
-if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) === null) {
+if (isset($_SESSION['id'])
+    && get_all_data_user($connect, (int) $_SESSION['id']) === null
+) {
     session_unset();
     header('Location: /index.php');
-} elseif (isset($_SESSION['name']) && isset($_SESSION['auth'])) {
+    die();
+} elseif (isset($_SESSION['name'])
+    && isset($_SESSION['auth'])
+) {
     $user_name = htmlspecialchars($_SESSION['name']);
     $is_auth = $_SESSION['auth'];
     $user_session_id = (int) $_SESSION['id'];
@@ -30,7 +36,10 @@ if(isset($_SESSION['id']) && get_all_data_user($connect, (int) $_SESSION['id']) 
 
 $categories = get_categories($connect);
 
-if (!isset($_GET['id']) || isset($_GET['id']) && $_GET['id'] === '' || get_lot($connect, $_GET['id']) === null) {
+if (!isset($_GET['id'])
+    || isset($_GET['id']) && $_GET['id'] === ''
+    || get_lot($connect, $_GET['id']) === null
+) {
     header('Location: 404.php');
     die();
 }
@@ -41,8 +50,7 @@ $lot = get_lot($connect, $lot_id);
 
 $title = htmlspecialchars($lot['title']);
 
-if (
-isset($_POST['cost'])
+if (isset($_POST['cost'])
 ) {
     $min_rate = htmlspecialchars($lot['current_price'] + $lot['rate_step']);
 
@@ -57,6 +65,7 @@ isset($_POST['cost'])
     $errors = array_filter($errors);
 
     $date_start = date('Y-m-d H:i:s', time());
+
     $user_id = $user_session_id;
 
     $data = [$date_start, $cost, $user_id, $lot_id];
@@ -81,11 +90,13 @@ if (isset($user_session_id)) {
 }
 
 
-if(get_user_id_last_rate($connect, $lot_id) !== null) {
-    $user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id']; 
+if (get_user_id_last_rate($connect, $lot_id) !== null) {
+    $user_id_last_rate = get_user_id_last_rate($connect, $lot_id)['user_id'];
 }
 
-$page_content = include_template('lots.php', [
+$page_content = include_template(
+    'lots.php',
+    [
     'categories' => $categories,
     'lot' => $lot,
     'is_auth' => $is_auth,
@@ -97,14 +108,18 @@ $page_content = include_template('lots.php', [
     'rate_count' => $rate_count,
     'errors_user' => $errors_user,
     'user_id_last_rate' => $user_id_last_rate
-]);
+    ]
+);
 
-$layout_content = include_template('layout.php', [
+$layout_content = include_template(
+    'layout.php',
+    [
     'content' => $page_content,
     'categories' => $categories,
     'title' => $title,
     'user_name' => $user_name,
     'is_auth' => $is_auth
-]);
+    ]
+);
 
 echo $layout_content;

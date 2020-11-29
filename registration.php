@@ -1,6 +1,7 @@
 <?php
 
 session_start();
+
 require_once 'helpers.php';
 require_once 'functions.php';
 
@@ -9,9 +10,13 @@ $connect = db_connect();
 $title = 'Регистрация';
 
 $email = '';
+
 $password = '';
+
 $first_name = '';
+
 $message = '';
+
 $len = '';
 
 $errors = [];
@@ -25,11 +30,10 @@ if (isset($_SESSION['auth'])) {
 
 $categories = get_categories($connect);
 
-if (
-    isset($_POST['email']) &&
-    isset($_POST['password']) &&
-    isset($_POST['name']) &&
-    isset($_POST['message'])
+if (isset($_POST['email'])
+    && isset($_POST['password'])
+    && isset($_POST['name'])
+    && isset($_POST['message'])
 ) {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -64,10 +68,24 @@ if (
         $errors['email'] = show_errors('email', 72, 'Введите email', 'Слишком длинный email');
     }
 
-    $errors['password'] = show_errors('password', 64, 'Введите пароль', 'Слишком длинный пароль');
-    $errors['name'] = show_errors('name', 100, 'Введите имя', 'Слишком длинное имя');
-    $errors['message'] = show_errors('message', 255, 'Напишите как с вами связаться',
-        'Слишком много контактных данных');
+    $errors['password'] = show_errors(
+        'password',
+        64,
+        'Введите пароль',
+        'Слишком длинный пароль'
+    );
+    $errors['name'] = show_errors(
+        'name',
+        100,
+        'Введите имя',
+        'Слишком длинное имя'
+    );
+    $errors['message'] = show_errors(
+        'message',
+        255,
+        'Напишите как с вами связаться',
+        'Слишком много контактных данных'
+    );
 
     $errors = array_filter($errors);
 
@@ -84,16 +102,26 @@ if (
     }
 }
 
-$page_content = include_template('sign-up.php', [
+$page_content = include_template(
+    'sign-up.php',
+    [
     'categories' => $categories,
     'errors' => $errors,
     'email' => $email,
     'password' => $password,
     'first_name' => $first_name,
     'message' => $message
-]);
+    ]
+);
 
-$layout_content = include_template('layout.php',
-    ['content' => $page_content, 'categories' => $categories, 'title' => $title, 'is_auth' => $is_auth]);
+$layout_content = include_template(
+    'layout.php',
+    [
+    'content' => $page_content,
+    'categories' => $categories,
+    'title' => $title,
+    'is_auth' => $is_auth
+    ]
+);
 
 echo $layout_content;
